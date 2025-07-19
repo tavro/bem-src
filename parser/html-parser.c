@@ -118,17 +118,24 @@ void freeNodeTree(HTMLNode* node) {
 	free(node);
 }
 
-void parser(char* inputString) {
+HTMLNode* parser(char* inputString) {
 	int inputStringLength = strlen(inputString);
 	int start = 0, end = 0;
-	int i, j;
+	int i;
 
-	for (i = 0; i < inputStringLength; i++) {
+	char tagName[32] = {0};
+	int tagStart = 1, tagEnd = 0;
+
+	for (i = tagStart; i < inputStringLength; i++) {
 		if (inputString[i] == '>') {
-			start = i + 1;
+			tagEnd = i - 1;
 			break;
 		}
 	}
+
+	strncpy(tagName, &inputString[tagStart], tagEnd - tagStart + 1);
+	tagName[tagEnd - tagStart + 1] = '\0';
+	start = i + 1;
 
 	// remove blank spaces
 	while (inputString[start] == ' ') {
@@ -142,15 +149,49 @@ void parser(char* inputString) {
 		}
 	}
 
-	for (j = start; j <= end; j++) {
-		printf("%c", inputString[j]);
+	char* content = (char*)malloc(end - start + 2);
+	strncpy(content, &inputString[start], end - start + 1);
+	content[end - start + 1] = '\0';
+
+	HTMLNode* document = createDocument();
+	HTMLNode* element = createElement(tagName);
+	HTMLNode* text = createText(content);
+	appendChild(element, text);
+	appendChild(document, element);
+
+	free(content);
+	return document;
+}
+
+void printNode(HTMLNode* node, int indent) {
+	for (int i = 0; i < indent; i++) printf("	");
+
+	switch(node->type) {
+		case DOCUMENT:
+			printf("Document\n");
+			break;
+		case ELEMENT:
+			printf("Element: <%s>\n", node->name);
+			break;
+		case TEXT:
+			printf("Text: \"%s\"\n", node->content);
+			break;
+		case COMMENT:
+			printf("Text: %s\n", node->content);
+			break;
 	}
 
-	printf("\n");
+	for (size_t i = 0; i < node->childCount; i++) {
+		printNode(node->children[i], indent + 1);
+	}
 }
 
 int main() {
 	char input[] = "<p>This is a test string</p>";
-	parser(input);
+
+	HTMLNode* DOM = parser(input);
+ 	printNode(DOM, 0);
+	freeNodeTree(DOM);
+
 	return 0;
 }
