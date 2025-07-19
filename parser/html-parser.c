@@ -1,3 +1,6 @@
+// Needed for strdup on linux
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -31,6 +34,89 @@ typedef struct HTMLNode {
 
 	struct HTMLNode* parent;
 } HTMLNode;
+
+HTMLNode* createNode(HTMLNodeType type) {
+	HTMLNode* node = (HTMLNode*)malloc(sizeof(HTMLNode));
+
+	node->type = type;
+	node->name = NULL;
+	node->content = NULL;
+	node->attributes = NULL;
+	node->children = NULL;
+	node->childCount = 0;
+	node->childCapacity = 0;
+	node->parent = NULL;
+
+	return node;
+}
+
+HTMLNode* createElement(const char* name) {
+	HTMLNode* node = createNode(ELEMENT);
+
+	node->name = strdup(name);
+	
+	return node;
+}
+
+HTMLNode* createText(const char* text) {
+	HTMLNode* node = createNode(TEXT);
+
+	node->content = strdup(text);
+
+	return node;
+}
+
+HTMLNode* createDocument() {
+	return createNode(DOCUMENT);
+}
+
+void appendChild(HTMLNode* parent, HTMLNode* child) {
+	if (parent->childCapacity == 0) {
+		parent->childCapacity = 4;
+		parent->children = (HTMLNode**)malloc(sizeof(HTMLNode*) * parent->childCapacity);
+	} else if (parent->childCount >= parent->childCapacity) {
+		parent->childCapacity *= 2;
+		parent->children = (HTMLNode**)realloc(parent->children, sizeof(HTMLNode*) * parent->childCapacity);
+	}
+
+	parent->children[parent->childCount++] = child;
+	child->parent = parent;
+}
+
+void addAttribute(HTMLNode* node, const char* name, const char* value) {
+	HTMLAttribute* attribute = (HTMLAttribute*)malloc(sizeof(HTMLAttribute));
+
+	attribute->name = strdup(name);
+	attribute->value = strdup(value);
+	attribute->next = node->attributes;
+
+	node->attributes = attribute;
+}
+
+void freeNodeTree(HTMLNode* node) {
+	if (!node) return;
+
+	free(node->name);
+	free(node->content);
+
+	HTMLAttribute* attribute = node->attributes;
+	while(attribute) {
+		HTMLAttribute* next = attribute->next;
+
+		free(attribute->name);
+		free(attribute->value);
+		free(attribute);
+
+		attribute = next;
+	}
+
+	for (size_t i = 0; i < node->childCount; i++) {
+		freeNodeTree(node->children[i]);
+	}
+
+	free(node->children);
+	free(node);
+}
 
 void parser(char* inputString) {
 	int inputStringLength = strlen(inputString);
