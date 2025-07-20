@@ -1,2 +1,6 @@
-parser: html-parser.c
-	$(CC) html-parser.c -o parser -Wall -Wextra -pedantic -std=c99
+CFLAGS = -Wall -Wextra -pedantic -std=c99
+
+all: html-parser css-parser
+
+html-parser css-parser: %: %.c
+	$(CC) $(CFLAGS) $< -o $@
