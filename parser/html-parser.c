@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 typedef enum {
 	DOCUMENT,
@@ -118,48 +119,114 @@ void freeNodeTree(HTMLNode* node) {
 	free(node);
 }
 
+char* skipWhitespace(char* s) {
+	while (isspace(*s)) s++;
+	return s;
+}
+
+char* parseTagName(char* s, char* tagName) {
+	s = skipWhitespace(s);
+
+	int i = 0;
+	while (*s && (isalnum(*s) || *s == '-' || *s == '_')) {
+		tagName[i++] = *s++;
+	}
+	tagName[i] = '\0';
+
+	return s;
+}
+
+char* parseAttributes(char* s, HTMLNode* node) {
+	s = skipWhitespace(s);
+
+	while (*s && *s != '>' && *s != '/') {
+		char attributeName[64], attributeValue[256];
+
+		int i = 0;
+		while (*s && *s != '=' && !isspace(*s)) {
+			attributeName[i++] = *s++;
+		}
+		attributeName[i] = '\0';
+
+		s = skipWhitespace(s);
+		if (*s == '=') {
+			s++;
+			s = skipWhitespace(s);
+			if (*s == '"' || *s == '\'') {
+				char quote = *s++;
+				i = 0;
+				while (*s && *s != quote) {
+					attributeValue[i++] = *s++;
+				}
+				attributeValue[i] = '\0';
+
+				if (*s == quote) s++;
+				addAttribute(node, attributeName, attributeValue);
+			}
+		}
+
+		s = skipWhitespace(s);
+	}
+
+	return s;
+}
+
+char* parseNode(char* s, HTMLNode* parent) {
+	s = skipWhitespace(s);
+
+	while (*s) {
+		if (strncmp(s, "</", 2) == 0) { // end tag
+			while (*s && *s != '>') s++;
+			if (*s == '>') s++;
+			return s;
+		} else if (*s == '<') { // start tag
+			s++;
+			if (*s == '!') { // skip comments
+				while (*s && *s != '>') s++;
+				if (*s == '>') s++;
+				continue;
+			}
+
+			char tagName[64];
+			s = parseTagName(s, tagName);
+
+			HTMLNode* node = createElement(tagName);
+			s = parseAttributes(s, node);
+
+			bool selfClosing = false;
+			if (*s == '/') {
+				selfClosing = true;
+				s++;
+			}
+			if (*s == '>') s++;
+
+			appendChild(parent, node);
+
+			if (!selfClosing) {
+				s = parseNode(s, node);
+			}
+		} else { // text
+			char text[1024];
+			int i = 0;
+			while (*s && *s != '<') {
+				text[i++] = *s++;
+			}
+			text[i] = '\0';
+
+			char* trimmed = skipWhitespace(text);
+			if (*trimmed != '\0') {
+				HTMLNode* textNode = createText(trimmed);
+				appendChild(parent, textNode);
+			}
+		}
+	}
+
+	return s;
+}
+
 HTMLNode* parser(char* inputString) {
-	int inputStringLength = strlen(inputString);
-	int start = 0, end = 0;
-	int i;
-
-	char tagName[32] = {0};
-	int tagStart = 1, tagEnd = 0;
-
-	for (i = tagStart; i < inputStringLength; i++) {
-		if (inputString[i] == '>') {
-			tagEnd = i - 1;
-			break;
-		}
-	}
-
-	strncpy(tagName, &inputString[tagStart], tagEnd - tagStart + 1);
-	tagName[tagEnd - tagStart + 1] = '\0';
-	start = i + 1;
-
-	// remove blank spaces
-	while (inputString[start] == ' ') {
-		start++;
-	}
-
-	for (i = start; i < inputStringLength; i++) {
-		if (inputString[i] == '<') {
-			end = i - 1;
-			break;
-		}
-	}
-
-	char* content = (char*)malloc(end - start + 2);
-	strncpy(content, &inputString[start], end - start + 1);
-	content[end - start + 1] = '\0';
-
 	HTMLNode* document = createDocument();
-	HTMLNode* element = createElement(tagName);
-	HTMLNode* text = createText(content);
-	appendChild(element, text);
-	appendChild(document, element);
-
-	free(content);
+	parseNode(inputString, document);
 	return document;
 }
 
@@ -171,7 +238,13 @@ void printNode(HTMLNode* node, int indent) {
 			printf("Document\n");
 			break;
 		case ELEMENT:
-			printf("Element: <%s>\n", node->name);
+			printf("Element: <%s", node->name);
+			HTMLAttribute* attribute = node->attributes;
+			while (attribute) {
+				printf(" %s=\"%s\"", attribute->name, attribute->value);
+				attribute = attribute->next;
+			}
+			printf(">\n");
 			break;
 		case TEXT:
 			printf("Text: \"%s\"\n", node->content);
@@ -187,7 +260,7 @@ void printNode(HTMLNode* node, int indent) {
 }
 
 int main() {
-	char input[] = "<p>This is a test string</p>";
+	char input[] = "<div id=\"main\" class=\"container\"><p>Hello <b>world</b>!</p></div><br/>";
 
 	HTMLNode* DOM = parser(input);
  	printNode(DOM, 0);
