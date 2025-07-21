@@ -23,26 +23,12 @@
 // Needed for strdup on linux
 #define _POSIX_C_SOURCE 200809L
 
+#include "css-parser.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-typedef struct CSSDeclaration {
-	char *property;
-	char *value;
-	struct CSSDeclaration *next;
-} CSSDeclaration;
-
-typedef struct CSSRule {
-	char *selector;
-	CSSDeclaration *declarations;
-	struct CSSRule *next;
-} CSSRule;
-
-typedef struct CSSOM {
-	CSSRule *rules;
-} CSSOM;
 
 char *strStrip(char *str) {
 	while (isspace((unsigned char)*str)) str++;
@@ -181,14 +167,4 @@ void freeCSSOM(CSSOM *cssom) {
 	}
 
 	free(cssom);
-}
-
-int main() {
-	char input[] = "body { color: black; background-color: white; } h1 { font-size: 24px; font-weight: bold; }";
-
-	CSSOM *cssom = parseCSS(input);
-	printCSSOM(cssom);
-	freeCSSOM(cssom);
-
-	return 0;
 }

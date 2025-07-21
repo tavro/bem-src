@@ -23,40 +23,13 @@
 // Needed for strdup on linux
 #define _POSIX_C_SOURCE 200809L
 
+#include "html-parser.h"
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-
-typedef enum {
-	DOCUMENT,
-	ELEMENT,
-	TEXT,
-	COMMENT
-} HTMLNodeType;
-
-typedef struct HTMLAttribute {
-	char* name;
-	char* value;
-
-	struct HTMLAttribute* next;
-} HTMLAttribute;
-
-typedef struct HTMLNode {
-	HTMLNodeType type;
-
-	char* name;
-	char* content;
-
-	HTMLAttribute* attributes;
-
-	struct HTMLNode** children;
-	size_t childCount;
-	size_t childCapacity;
-
-	struct HTMLNode* parent;
-} HTMLNode;
 
 HTMLNode* createNode(HTMLNodeType type) {
 	HTMLNode* node = (HTMLNode*)malloc(sizeof(HTMLNode));
@@ -279,14 +252,4 @@ void printNode(HTMLNode* node, int indent) {
 	for (size_t i = 0; i < node->childCount; i++) {
 		printNode(node->children[i], indent + 1);
 	}
-}
-
-int main() {
-	char input[] = "<div id=\"main\" class=\"container\"><p>Hello <b>world</b>!</p></div><br/>";
-
-	HTMLNode* DOM = parser(input);
- 	printNode(DOM, 0);
-	freeNodeTree(DOM);
-
-	return 0;
 }
