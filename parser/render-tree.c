@@ -39,8 +39,38 @@ typedef struct RenderNode {
 	size_t childCount;
 } RenderNode;
 
+int hasAttribute(HTMLNode *node, const char *attrName, const char *expectedValue, int allowPartialMatch) {
+	for (HTMLAttribute *attr = node->attributes; attr; attr = attr->next) {
+		if (strcmp(attr->name, attrName) == 0) {
+			if (allowPartialMatch) {
+				const char *val = attr->value;
+				const char *found = strstr(val, expectedValue);
+				while (found) {
+					int isStart = (found == val || found[-1] == ' ');
+					int isEnd = (found[strlen(expectedValue)] == '\0' || found[strlen(expectedValue)] == ' ');
+					if (isStart && isEnd) return 1;
+					found = strstr(found + 1, expectedValue);
+				}
+
+				return 0;
+			} else {
+				return strcmp(attr->value, expectedValue) == 0;
+			}
+		}
+	}
+
+	return 0;
+}
+
 int matchSelector(const char *selector, HTMLNode *node) {
 	if (!selector || !node || node->type != ELEMENT || !node->name) return 0;
+
+	if (selector[0] == '#') {
+		return hasAttribute(node, "id", selector + 1, 0);
+	} else if (selector[0] == '.') {
+		return hasAttribute(node, "class", selector + 1, 1);
+	}
+
 	return strcmp(selector, node->name) == 0;
 }
 
@@ -136,8 +166,8 @@ void freeRenderTree(RenderNode *node) {
 }
 
 int main() {
-	char htmlInput[] = "<body><div id=\"main\" class=\"container\"><p>Hello <b>world</b>!</p><p>Hello world <b>again</b>!</p></div><br/></body>";
-	char cssInput[] = "body { color: black; background-color: white; } div { width: 50%; margin: auto; } p { font-size: 24px; }";
+	char htmlInput[] = "<body><div id=\"main\" class=\"container test\"><p>Hello <b class=\"test\">world</b>!</p><p>Hello world <b>again</b>!</p></div><br/></body>";
+	char cssInput[] = ".test { color: red; } #main { color: black; } .container { font-size: 16px; } body { color: black; background-color: white; } div { width: 50%; margin: auto; } p { font-size: 24px; }";
 
 	HTMLNode* DOM = parser(htmlInput);
  	// printNode(DOM, 0);
