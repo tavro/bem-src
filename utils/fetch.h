@@ -20,32 +20,32 @@
  * SOFTWARE.
  */
 
-#ifndef CSS_PARSER_H
-#define CSS_PARSER_H
+#ifndef FETCH_H
+#define FETCH_H
 
-typedef struct CSSDeclaration {
-	char *property;
-	char *value;
-	struct CSSDeclaration *next;
-} CSSDeclaration;
+#include <stdlib.h>
 
-typedef struct CSSRule {
-	char *selector;
-	CSSDeclaration *declarations;
-	struct CSSRule *next;
-} CSSRule;
+struct MemoryStruct {
+	char *memory;
+	size_t size;
+};
 
-typedef struct CSSOM {
-	CSSRule *rules;
-} CSSOM;
+#define MAX_CSS_LINKS 32
 
-char *strStrip(char *str);
-char *subStr(const char *src, int start, int end);
+static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
-CSSDeclaration *parseDeclarations(const char *block);
-CSSOM *parseCSS(const char *css);
+int downloadURL(const char *url, struct MemoryStruct *chunk);
 
-void printCSSOM(CSSOM *cssom);
-void freeCSSOM(CSSOM *cssom);
+char *extractInlineCSS(const char *html);
+
+int extractCSSLinks(const char *html, char links[][1024], int maxLinks);
+
+char *strAppend(char *base, const char *append);
+
+void resolveURL(const char *baseURL, const char *link, char *outURL, size_t maxLen);
+
+int fetchHTMLAndCSS(const char *url, char **htmlContent, char **cssContent);
+
+char *extractMetaData(char **html);
 
 #endif

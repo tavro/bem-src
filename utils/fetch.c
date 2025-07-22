@@ -23,15 +23,12 @@
 // Needed for strdup on linux
 #define _POSIX_C_SOURCE 200809L
 
+#include "fetch.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <curl/curl.h> // TODO: Implement my own cURL at some point
-
-struct MemoryStruct {
-	char *memory;
-	size_t size;
-};
 
 static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
 	size_t realsize = size * nmemb;
@@ -107,7 +104,6 @@ char *extractInlineCSS(const char *html) {
 	return css;
 }
 
-#define MAX_CSS_LINKS 32
 int extractCSSLinks(const char *html, char links[][1024], int maxLinks) {
 	int count = 0;
 	const char *pos = html;
@@ -307,29 +303,4 @@ char *extractMetaData(char **html) {
 	*html = newHTML;
 
 	return meta;
-}
-
-// Compile using:
-// gcc fetch.c -o fetch -Wall -Wextra -pedantic -lcurl -std=c99
-// for curl to work
-int main() {
-	const char *url = "https://www.example.com";
-	char *HTMLContent = NULL;
-	char *CSSContent = NULL;
-	char *metaData = NULL;
-
-	int res = fetchHTMLAndCSS(url, &HTMLContent, &CSSContent);
-	if (res == 0) {
-		metaData = extractMetaData(&HTMLContent);
-
-		printf("Meta Data:\n%s\n\n", metaData ? metaData : "(none)");
-		printf("HTML:\n%s\n\n", HTMLContent);
-		printf("CSS:\n%s\n\n", CSSContent);
-
-		free(HTMLContent);
-		free(CSSContent);
-		free(metaData);
-	}
-
-	return res;
 }

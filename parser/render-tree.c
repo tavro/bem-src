@@ -25,6 +25,7 @@
 
 #include "html-parser.h"
 #include "css-parser.h"
+#include "../utils/fetch.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -165,9 +166,51 @@ void freeRenderTree(RenderNode *node) {
 	free(node);
 }
 
+
+
+/*
 int main() {
-	char htmlInput[] = "<body><div id=\"main\" class=\"container test\"><p>Hello <b class=\"test\">world</b>!</p><p>Hello world <b>again</b>!</p></div><br/></body>";
-	char cssInput[] = ".test { color: red; } #main { color: black; } .container { font-size: 16px; } body { color: black; background-color: white; } div { width: 50%; margin: auto; } p { font-size: 24px; }";
+	const char *url = "https://www.example.com";
+	char *htmlInput = NULL;
+	char *cssInput = NULL;
+	char *metaData = NULL;
+
+	int res = fetchHTMLAndCSS(url, &HTMLContent, &CSSContent);
+	if (res == 0) {
+		metaData = extractMetaData(&HTMLContent);
+
+		printf("Meta Data:\n%s\n\n", metaData ? metaData : "(none)");
+		printf("HTML:\n%s\n\n", HTMLContent);
+		printf("CSS:\n%s\n\n", CSSContent);
+
+		free(HTMLContent);
+		free(CSSContent);
+		free(metaData);
+	}
+
+	return res;
+}
+*/
+
+
+int main() {
+	const char *url = "https://www.example.com";
+	char *htmlInput = NULL;
+	char *cssInput = NULL;
+	char *metaData = NULL;
+
+	int res = fetchHTMLAndCSS(url, &htmlInput, &cssInput);
+	if (res == 0) {
+		metaData = extractMetaData(&htmlInput);
+
+		// printf("Meta Data:\n%s\n\n", metaData ? metaData : "(none)");
+		// printf("HTML:\n%s\n\n", htmlInput);
+		// printf("CSS:\n%s\n\n", cssInput);
+
+		// free(htmlInput);
+		// free(cssInput);
+		// free(metaData);
+	}
 
 	HTMLNode* DOM = parser(htmlInput);
  	// printNode(DOM, 0);
