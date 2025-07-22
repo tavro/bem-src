@@ -16,3 +16,7 @@ https://web.dev/articles/critical-rendering-path/render-tree-construction
 4. Rendering engine
 
 https://github.com/libsdl-org/SDL/releases
+
+---
+
+HTML Element Reference List: https://www.w3schools.com/TAGS/default.asp 
