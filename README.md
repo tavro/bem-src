@@ -12,3 +12,7 @@ specification at https://www.w3.org/TR/cssom-1/
 3. Construct render tree (Combine DOM & CSSOM)
 
 https://web.dev/articles/critical-rendering-path/render-tree-construction
+
+4. Rendering engine
+
+https://github.com/libsdl-org/SDL/releases
