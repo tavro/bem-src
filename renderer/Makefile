@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -g `pkg-config --cflags sdl3`
-LDFLAGS = -lcurl `pkg-config --libs sdl3`
+LDFLAGS = -lcurl -lSDL3_ttf `pkg-config --libs sdl3`
 
 TARGET = renderer
 SRC = renderer.c
