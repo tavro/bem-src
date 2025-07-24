@@ -20,3 +20,5 @@ https://github.com/libsdl-org/SDL/releases
 ---
 
 HTML Element Reference List: https://www.w3schools.com/TAGS/default.asp 
+
+CSS Default Values for tags: https://www.w3schools.com/cssref/css_default_values.php
