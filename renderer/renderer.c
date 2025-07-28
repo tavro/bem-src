@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+static int scrollOffset = 0;
+
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 
@@ -116,8 +118,17 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) { // This function 
                     }
                     DOM = parser(htmlInput);
                 }
-
+                isTypingUrl = false;
             }
+        }
+    }
+
+    if (!isTypingUrl && event->type == SDL_EVENT_KEY_DOWN) {
+        const int scrollStep = 20;
+        if (event->key.scancode == SDL_SCANCODE_DOWN) {
+            scrollOffset -= scrollStep;
+        } else if (event->key.scancode == SDL_SCANCODE_UP) {
+            scrollOffset += scrollStep;
         }
     }
 
@@ -191,15 +202,13 @@ FontData* handleNode(HTMLNode* node) {
 // TODO: Add browser default CSSOM
 static int yPos = 0;
 void renderNode(HTMLNode* node) {
-	switch(node->type) {
-		case TEXT:
+    switch (node->type) {
+        case TEXT: {
             FontData* data = handleNode(node);
-
             SDL_Color textColor = {255, 255, 255, 255};
-
             size_t textLen = strlen(node->content);
 
-            if (data) { // TODO: Make use of margins.
+            if (data) {
                 font = LoadFontSafely("./resources/DejaVuSansMonoForConso1as.ttf", data->fontSize, &font);
                 boldFont = LoadFontSafely("./resources/DejaVuSansMonoForConso1as-Bold.ttf", data->fontSize, &boldFont);
 
@@ -207,27 +216,36 @@ void renderNode(HTMLNode* node) {
                 SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
 
                 SDL_FRect dstRect = {
-                    .x = 0.0f,
-                    .y = (float)(yPos),
+                    .x = data->horizontalMargin,
+                    .y = (float)(yPos + data->verticalMargin + scrollOffset),
                     .w = (float)textSurface->w,
                     .h = (float)textSurface->h
                 };
+
+                if (dstRect.y + dstRect.h < 30 || dstRect.y > 480) {
+                    yPos += textSurface->h + (int)data->verticalMargin;
+                    SDL_DestroySurface(textSurface);
+                    SDL_DestroyTexture(textTexture);
+                    free(data);
+                    return;
+                }
+
                 SDL_RenderTexture(renderer, textTexture, NULL, &dstRect);
-                yPos += textSurface->h;
+                yPos += textSurface->h + (int)data->verticalMargin;
 
                 SDL_DestroySurface(textSurface);
                 SDL_DestroyTexture(textTexture);
             }
             free(data);
+            break;
+        }
+        default:
+            break;
+    }
 
-			break;
-		default:
-			break;
-	}
-
-	for (size_t i = 0; i < node->childCount; i++) {
-		renderNode(node->children[i]);
-	}
+    for (size_t i = 0; i < node->childCount; i++) {
+        renderNode(node->children[i]);
+    }
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
@@ -254,6 +272,28 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     yPos = 40;
     renderNode(DOM);
+
+    if (scrollOffset > 0) scrollOffset = 0;
+    if (yPos < 480) scrollOffset = 0;
+    else if (-scrollOffset > yPos - 480)
+        scrollOffset = -(yPos - 480);
+
+    int totalContentHeight = yPos - scrollOffset;
+    float scrollRatio = 480.0f / (float)totalContentHeight;
+    float scrollbarHeight = 480.0f * scrollRatio;
+    if (scrollbarHeight < 20) scrollbarHeight = 20;
+
+    float scrollbarY = (-scrollOffset / (float)totalContentHeight) * 480.0f;
+    if (scrollbarY < 30) scrollbarY = 30;
+
+    SDL_FRect scrollbar = {
+        .x = 625,
+        .y = scrollbarY,
+        .w = 10,
+        .h = scrollbarHeight
+    };
+    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+    SDL_RenderFillRect(renderer, &scrollbar);
 
     SDL_RenderPresent(renderer);
     return SDL_APP_CONTINUE;
