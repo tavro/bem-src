@@ -30,6 +30,9 @@
 #include <errno.h>
 #include <zlib.h>
 
+#define BEM_SHA3_256_SIZE 32
+#define BEM_SHA3_512_SIZE 64
+
 typedef enum {
     BACKGROUND_ATTACHMENT_SCROLL,
     BACKGROUND_ATTACHMENT_FIXED
@@ -196,7 +199,157 @@ typedef enum {
     ELEMENT_COMMENT,
     ELEMENT_DOCTYPE,
 
-    ELEMENT_ // TODO: add all tags
+    ELEMENT_A,
+    ELEMENT_ABBR,
+    ELEMENT_ACRONYM,
+    ELEMENT_ADDRESS,
+    ELEMENT_APPLET,
+    ELEMENT_AREA,
+    ELEMENT_ARTICLE,
+    ELEMENT_ASIDE,
+    ELEMENT_AUDIO,
+
+    ELEMENT_B,
+    ELEMENT_BASE,
+    ELEMENT_BASEFONT,
+    ELEMENT_BDI,
+    ELEMENT_BDO,
+    ELEMENT_BIG,
+    ELEMENT_BLINK,
+    ELEMENT_BLOCKQUOTE,
+    ELEMENT_BODY,
+    ELEMENT_BR,
+    ELEMENT_BUTTON,
+
+    ELEMENT_CANVAS,
+    ELEMENT_CAPTION,
+    ELEMENT_CENTER,
+    ELEMENT_CITE,
+    ELEMENT_CODE,
+    ELEMENT_COL,
+    ELEMENT_COLGROUP,
+
+    ELEMENT_DATA,
+    ELEMENT_DATALIST,
+    ELEMENT_DD,
+    ELEMENT_DEL,
+    ELEMENT_DETAILS,
+    ELEMENT_DFN,
+    ELEMENT_DIALOG,
+    ELEMENT_DIR,
+    ELEMENT_DIV,
+    ELEMENT_DL,
+    ELEMENT_DT,
+
+    ELEMENT_EM,
+    ELEMENT_EMBED,
+
+    ELEMENT_FIELDSET,
+    ELEMENT_FIGCAPTION,
+    ELEMENT_FIGURE,
+    ELEMENT_FONT,
+    ELEMENT_FOOTER,
+    ELEMENT_FORM,
+    ELEMENT_FRAME,
+    ELEMENT_FRAMESET,
+
+    ELEMENT_H1,
+    ELEMENT_H2,
+    ELEMENT_H3,
+    ELEMENT_H4,
+    ELEMENT_H5,
+    ELEMENT_H6,
+    ELEMENT_HEAD,
+    ELEMENT_HEADER,
+    ELEMENT_HR,
+    ELEMENT_HTML,
+
+    ELEMENT_I,
+    ELEMENT_IFRAME,
+    ELEMENT_IMG,
+    ELEMENT_INPUT,
+    ELEMENT_INS,
+    ELEMENT_ISINDEX,
+
+    ELEMENT_KBD,
+
+    ELEMENT_LABEL,
+    ELEMENT_LEGEND,
+    ELEMENT_LI,
+    ELEMENT_LINK,
+
+    ELEMENT_MAIN,
+    ELEMENT_MAP,
+    ELEMENT_MARK,
+    ELEMENT_MENU,
+    ELEMENT_META,
+    ELEMENT_METER,
+    ELEMENT_MULTICOL,
+
+    ELEMENT_NAV,
+    ELEMENT_NOBR,
+    ELEMENT_NOFRAMES,
+    ELEMENT_NOSCRIPT,
+
+    ELEMENT_OBJECT,
+    ELEMENT_OL,
+    ELEMENT_OPTGROUP,
+    ELEMENT_OPTION,
+    ELEMENT_OUTPUT,
+
+    ELEMENT_P,
+    ELEMENT_PARAM,
+    ELEMENT_PICTURE,
+    ELEMENT_PRE,
+    ELEMENT_PROGRESS,
+
+    ELEMENT_Q,
+
+    ELEMENT_RB,
+    ELEMENT_RP,
+    ELEMENT_RT,
+    ELEMENT_RTC,
+    ELEMENT_RUBY,
+
+    ELEMENT_S,
+    ELEMENT_SAMP,
+    ELEMENT_SCRIPT,
+    ELEMENT_SECTION,
+    ELEMENT_SELECT,
+    ELEMENT_SMALL,
+    ELEMENT_SOURCE,
+    ELEMENT_SPACER,
+    ELEMENT_SPAN,
+    ELEMENT_STRIKE,
+    ELEMENT_STRONG,
+    ELEMENT_STYLE,
+    ELEMENT_SUB,
+    ELEMENT_SUMMARY,
+    ELEMENT_SUP,
+
+    ELEMENT_TABLE,
+    ELEMENT_TBODY,
+    ELEMENT_TD,
+    ELEMENT_TEMPLATE,
+    ELEMENT_TEXTAREA,
+    ELEMENT_TFOOT,
+    ELEMENT_TH,
+    ELEMENT_THEAD,
+    ELEMENT_TIME,
+    ELEMENT_TITLE,
+    ELEMENT_TR,
+    ELEMENT_TRACK,
+    ELEMENT_TT,
+
+    ELEMENT_U,
+    ELEMENT_UL,
+
+    ELEMENT_VAR,
+    ELEMENT_VIDEO,
+
+    ELEMENT_WBR,
+
+    ELEMENT_MAX
 } bem_element;
 
 typedef enum {
@@ -207,7 +360,103 @@ typedef enum {
     COMPUTE_FIRST_LETTER
 } bem_compute;
 
-struct bem_file {
+typedef enum {
+    RESOLUTION_NONE,
+    RESOLUTION_PER_INCH,
+    RESOLUTION_PER_CM
+} bem_resolution;
+
+typedef enum {
+    MATCH_ATTRIBUTE_EXIST,
+    MATCH_ATTRIBUTE_EQUALS,
+    MATCH_ATTRIBUTE_CONTAINS,
+    MATCH_ATTRIBUTE_BEGINS,
+    MATCH_ATTRIBUTE_ENDS,
+    MATCH_ATTRIBUTE_LANGUAGE
+    MATCH_ATTRIBUTE_SPACE
+    MATCH_CLASS,
+    MATCH_ID,
+    MATCH_PSEUDO_CLASS
+} bem_match;
+
+typedef enum {
+    RELATION_CHILD,
+    RELATION_IMMEDIATE_CHILD,
+    RELATION_SIBLING,
+    RELATION_IMMEDIATE_SIBLING
+} bem_relation;
+
+typedef unsigned char bem_uchar;
+
+typedef unsigned char bem_sha3_256[BEM_SHA3_256_SIZE];
+typedef unsigned char bem_sha3_512[BEM_SHA3_512_SIZE];
+
+typedef struct {
+    float left_offset;
+    float top_offset;
+    float right_offset;
+    float bottom_offset;
+} bem_rectangle;
+
+typedef struct {
+    bem_match match;
+
+    const char *name, *value;
+} bem_css_selector_statement;
+
+typedef struct {
+    bem_css_selector *previous;
+    bem_element element;
+    bem_relation relation;
+
+    size_t statement_amount;
+    bem_css_selector_statement *statements;
+} bem_css_selector;
+
+typedef struct {
+    bem_sha3_256 hash;
+    bem_css_selector *selector;
+    bem_dictionary *properties;
+} bem_rule_set;
+
+typedef struct {
+    int needs_sorting;
+
+    size_t rules_size;
+    size_t rules_amount;
+    bem_rule_set **rules;
+} bem_rule_collection;
+
+typedef struct {
+    bem_memory_pool *pool;
+    bem_media media;
+    bem_rule_collection all_rules;
+    bem_rule_collection rules[ELEMENT_MAX];
+} bem_stylesheet;
+
+typedef struct {
+    unsigned char bytes_used;
+    unsigned char bytes_per_block;
+    unsigned char state[200];
+} bem_sha3;
+
+typedef struct {
+    bem_memory_pool *pool;
+    
+    const char *format;
+    
+    int width, height;
+    int x_resolution, y_resolution;
+
+    bem_resolution units;
+} bem_image;
+
+typedef struct {
+    const char *key;
+    const char *value;
+} bem_pair;
+
+typedef struct {
     bem_memory_pool *pool;
     const char *url;
 
@@ -216,32 +465,35 @@ struct bem_file {
     const bem_uchar *buffer, *buffer_pointer, *buffer_end;
 
     int line_number;
-};
+} bem_file;
 
-struct bem_memory_pool {
+typedef struct {
     struct lconv *locale;
     size_t locale_decimal_length;
 
-    // TODO: fonts
+    // TODO: font stuff
 
     size_t strings_amount;
     size_t strings_size;
     char **strings;
 
-    /*
-    TODO:
-    bem_dict *urls;
+    bem_dictionary *urls;
     bem_url_callback url_callback;
     void *url_context;
-    */
 
-    /*
-    TODO: 
     bem_error_callback error_callback;
     void *error_context;
     char *last_error;
-    */
-};
+} bem_memory_pool;
+
+typedef struct {
+    bem_memory_pool *pool;
+
+    size_t pair_amount;
+    size_t pairs_size;
+
+    bem_pair *pairs;
+} bem_dictionary; 
 
 typedef struct {
     bem_element element;
@@ -253,7 +505,7 @@ typedef struct {
     int score;
     int order;
     
-    // TODO: bem_rule_set *rule;
+    bem_rule_set *rule;
 } bem_css_match;
 
 typedef struct {
@@ -306,11 +558,71 @@ typedef struct {
 } bem_border_radius;
 
 typedef struct {
-    // TODO:
+    bem_rectangle bounds;
+    bem_rectangle clip;
+    bem_rectangle border_image_outset;
+    bem_rectangle border_image_slice;
+    bem_rectangle border_image_width;
+    bem_rectangle list_style_type;
+    bem_rectangle margin;
+    bem_rectangle padding;
+
+    bem_size size;
+    bem_size max_size;
+    bem_size min_size;
+    bem_size background_size;
+    bem_size border_spacing;
+
+    bem_background_attachment background_attachment;
+
+    bem_background_box background_clip;
+    bem_background_box background_origin;
+
+    bem_color background_color;
+
+    const char *background_image;
+    const char *border_image;
+    const char *list_style_image;
+
+    bem_point background_position;
+
+    bem_background_repeat background_repeat;
+
+    bem_border border;
+
+    bool border_image_fill;
+
+    bem_border_image_repeat border_image_repeat[2];
+
+    bem_border_radius border_radius;
+
+    bem_box_shadow box_shadow;
+
+    bem_break break_after;
+    bem_break break_before;
+    bem_break break_inside;
+
+    bem_float float_value;
+
+    bem_list_style_position list_style_position;
+
+    bem_list_style_type list_style_type;
+
+    int orphans;
+    int windows;
+    int z_index;
+
+    bem_overflow overflow;
 } bem_box;
 
 typedef struct {
-    // TODO:
+    const char *type;
+
+    int color_bits;
+    int monochrome_bits;
+
+    bem_rectangle margin;
+    bem_size size;
 } bem_media;
 
 typedef struct {
@@ -321,23 +633,39 @@ typedef struct {
 } bem_table;
 
 typedef struct {
-    // TODO:
+    bem_color color;
+    bem_direction direction;
+
+    // TODO: font stuff
+
+    const char* font_family;
+    const char* quotes[4];
+
+    float font_size;
+    float font_size_adjust;
+    float letter_spacing;
+    float line_height;
+    float text_indent;
+    float word_spacing;
+    
+    bem_text_align text_align;
+    bem_text_decoration text_decoration;
+    bem_text_transform text_transform;
+    bem_unicode_bidirectional unicode_bidirectional;
+    bem_white_space white_space;
 } bem_text;
 
-struct bem_document {
+typedef struct {
     bem_memory_pool *pool;
-    // TODO: bem_stylesheet *css;
+    bem_stylesheet *css;
     bem_node *root;
     
-    /*
-    TODO:
     bem_error_callback error_callback;
     void *error_context;
 
     bem_url_callback url_callback;
     void *url_context;
-    */
-};
+} bem_document;
 
 struct bem_node {
     bem_element element;
@@ -353,8 +681,8 @@ struct bem_node {
             bem_node *first_child;
             bem_node *last_child;
 
-            // TODO: bem_dict *attributes;
-            // TODO: const bem_dict *base_properties;
+            bem_dictionary *attributes;
+            const bem_dictionary *base_properties;
 
             bem_document *html;
         } element;
@@ -363,5 +691,9 @@ struct bem_node {
         char unknown[1];
     } value;
 };
+
+typedef int (*bem_comparison_function)(const void *, const void *);
+typedef bool (*bem_error_callback)(void *context, const char *message, int line_number);
+typedef char *(*bem_url_callback)(void *context, const char *url, char *buffer, size_t buffer_size);
 
 // TODO: Define function headers
