@@ -696,4 +696,27 @@ typedef int (*bem_comparison_function)(const void *, const void *);
 typedef bool (*bem_error_callback)(void *context, const char *message, int line_number);
 typedef char *(*bem_url_callback)(void *context, const char *url, char *buffer, size_t buffer_size);
 
+extern bool	defaultErrorCallback(void *context, const char *message, int line_number);
+extern char	*defaultURLCallback(void *context, const char *url, char *buffer, size_t buffer_size);
+
+extern void	bemCSSImportString(bem_stylesheet *css, bem_dictionary *properties, const char *str);
+extern void	bemCSSSelectorAddStatement(bem_stylesheet *css, bem_css_selector *selector, bem_match match, const char *name, const char *value);
+extern void	bemCSSSelectorDelete(bem_css_selector *selector);
+extern void	bemCSSSelectorHash(bem_css_selector *selector, bem_sha3_256 hash);
+extern bem_css_selector *bemCSSSelectorNew(bem_stylesheet *css, bem_css_selector *previous, bem_element element, bem_relation relation);
+
+extern void	bemRuleCollectionAdd(bem_stylesheet *css, bem_rule_collection *collection, bem_rule_set *rule);
+extern void	bemRuleCollectionClear(bem_rule_collection *collection, int delete_rules);
+extern bem_rule_set *bemRuleCollectionFindHash(bem_rule_collection *collection, const bem_sha3_256 hash);
+extern void	bemRuleDelete(bem_rule_set *rule);
+extern bem_rule_set *bemRuleNew(bem_stylesheet *css, const bem_sha3_512 hash, bem_css_selector *selector, bem_dictionary *properties);
+
+extern void	bemCSSDelete(bem_stylesheet *css);
+extern bem_stylesheet *bemCSSNew(bem_memory_pool *pool);
+extern bool	bemCSSImport(bem_stylesheet *css, bem_file *file);
+extern bool	bemCSSImportDefault(bem_stylesheet *css);
+extern void	bemCSSSetErrorCallback(bem_stylesheet *css, bem_error_callback callback, void *context);
+extern void	bemCSSSetURLCallback(bem_stylesheet *css, bem_url_callback callback, void *context);
+extern int bemCSSSetMedia(bem_stylesheet *css, const char *type, int color_bits, int grayscale_bits, float width, float height);
+
 // TODO: Define function headers
