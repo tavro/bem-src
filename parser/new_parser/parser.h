@@ -719,4 +719,44 @@ extern void	bemCSSSetErrorCallback(bem_stylesheet *css, bem_error_callback callb
 extern void	bemCSSSetURLCallback(bem_stylesheet *css, bem_url_callback callback, void *context);
 extern int bemCSSSetMedia(bem_stylesheet *css, const char *type, int color_bits, int grayscale_bits, float width, float height);
 
-// TODO: Define function headers
+extern bem_dictionary *bemDictionaryCopy(const bem_dictionary *dictionary);
+extern void	bemDictionaryDelete(bem_dictionary *dictionary);
+extern size_t bemDictionaryGetCount(const bem_dictionary *dictionary);
+extern const char *bemDictionaryGetIndexKeyValue(const bem_dictionary *dictionary, size_t index, const char **key);
+extern const char *bemDictionaryGetKeyValue(const bem_dictionary *dictionary, const char *key);
+extern bem_dictionary *bemDictionaryNew(bem_memory_pool *pool);
+extern void	bemDictionaryRemoveKey(bem_dictionary *dictionary, const char *key);
+extern void	bemDictionarySetKeyValue(bem_dictionary *dictionary, const char *key, const char *value);
+
+extern void	bemFileDelete(bem_file *file);
+extern int bemFileGetc(bem_file *file);
+extern bem_file	*bemFileNewBuffer(bem_memory_pool *pool, const void *buffer, size_t bytes);
+extern bem_file	*bemFileNewString(bem_memory_pool *pool, const char *str);
+extern bem_file	*bemFileNewURL(bem_memory_pool *pool, const char *url, const char *base_url);
+extern size_t bemFileRead(bem_file *file, void *buffer, size_t bytes);
+extern size_t bemFileSeek(bem_file *file, size_t offset);
+extern void	bemFileUngetc(bem_file *file, int ch);
+
+extern bool	bemNodeComputeCSSTextFont(bem_node *node, const bem_dictionary *properties, bem_text *text);
+extern bem_node	*bemNodeNewUnknown(bem_node *parent, const char *unknown);
+
+extern void	bemImageDelete(bem_image *image);
+extern const char *bemImageGetFormat(bem_image *image);
+extern int bemImageGetHeight(bem_image *image);
+extern bem_size bemImageGetSize(bem_image *image);
+extern int bemImageGetWidth(bem_image *image);
+extern bem_image_t *bemImageNew(bem_memory_pool *pool, bem_file *file);
+
+extern void	bemPoolDelete(bem_memory_pool *pool);
+extern const char *bemPoolGetLastError(bem_memory_pool *pool);
+extern const char *bemPoolGetString(bem_memory_pool *pool, const char *str);
+extern const char *bemPoolGetURL(bem_memory_pool *pool, const char *url, const char *base_url);
+extern bem_memory_pool *bemPoolNew(void);
+extern void	bemPoolSetErrorCallback(bem_memory_pool *pool, bem_error_callback callback, void *context);
+extern void	bemPoolSetURLCallback(bem_memory_pool *pool, bem_url_callback callback, void *context);
+
+extern void	bemSHA3Final(bem_sha3 *context, unsigned char *hash, size_t hash_length);
+extern void	bemSHA3Init(bem_sha3 *context);
+extern void	bemSHA3Update(bem_sha3 *context, const void *data, size_t data_length);
+
+// TODO: Add function declarations for html and fonts
