@@ -34,6 +34,45 @@
 #define BEM_SHA3_512_SIZE 64
 
 typedef enum {
+    FONT_STRECH_NORMAL,
+    FONT_STRECH_ULTRA_CONDENCED,
+    FONT_STRECH_EXTRA_CONDENCED,
+    FONT_STRECH_CONDENCED,
+    FONT_STRECH_SEMI_CONDENCED,
+    FONT_STRECH_ULTRA_EXPANDED,
+    FONT_STRECH_EXTRA_EXPANDED,
+    FONT_STRECH_EXPANDED,
+    FONT_STRECH_SEMI_EXPANDED
+} font_strech;
+
+typedef enum {
+    FONT_STYLE_NORMAL,
+    FONT_STYLE_ITALIC,
+    FONT_STYLE_OBLIQUE
+} font_style;
+
+typedef enum {
+    FONT_VARIANT_NORMAL,
+    FONT_VARIANT_SMALL_CAPS
+} font_variant;
+
+typedef enum {
+    FONT_WEIGHT_NORMAL,
+    FONT_WEIGHT_BOLD,
+    FONT_WEIGHT_BOLDER,
+    FONT_WEIGHT_LIGHTER,
+    FONT_WEIGHT_100 = 100,
+    FONT_WEIGHT_200 = 200,
+    FONT_WEIGHT_300 = 300,
+    FONT_WEIGHT_400 = 400,
+    FONT_WEIGHT_500 = 500,
+    FONT_WEIGHT_600 = 600,
+    FONT_WEIGHT_700 = 700,
+    FONT_WEIGHT_800 = 800,
+    FONT_WEIGHT_900 = 900
+} font_weight;
+
+typedef enum {
     BACKGROUND_ATTACHMENT_SCROLL,
     BACKGROUND_ATTACHMENT_FIXED
 } bem_background_attachment;
@@ -471,9 +510,13 @@ typedef struct {
     struct lconv *locale;
     size_t locale_decimal_length;
 
-    // TODO: font stuff
+    bool fonts_loaded;
+    size_t font_amount;
+    size_t fonts_size;
+    size_t font_index[256];
+    // TODO: font_info *fonts;
 
-    size_t strings_amount;
+    size_t string_amount;
     size_t strings_size;
     char **strings;
 
@@ -636,7 +679,11 @@ typedef struct {
     bem_color color;
     bem_direction direction;
 
-    // TODO: font stuff
+    bem_font *font;
+    bem_font_stretch font_strech;
+    bem_font_style font_style;
+    bem_font_variant font_variant;
+    bem_font_weight font_weight;
 
     const char* font_family;
     const char* quotes[4];
@@ -745,7 +792,7 @@ extern const char *bemImageGetFormat(bem_image *image);
 extern int bemImageGetHeight(bem_image *image);
 extern bem_size bemImageGetSize(bem_image *image);
 extern int bemImageGetWidth(bem_image *image);
-extern bem_image_t *bemImageNew(bem_memory_pool *pool, bem_file *file);
+extern bem_image *bemImageNew(bem_memory_pool *pool, bem_file *file);
 
 extern void	bemPoolDelete(bem_memory_pool *pool);
 extern const char *bemPoolGetLastError(bem_memory_pool *pool);
@@ -759,4 +806,28 @@ extern void	bemSHA3Final(bem_sha3 *context, unsigned char *hash, size_t hash_len
 extern void	bemSHA3Init(bem_sha3 *context);
 extern void	bemSHA3Update(bem_sha3 *context, const void *data, size_t data_length);
 
-// TODO: Add function declarations for html and fonts
+extern void	bemFontAddCached(bem_memory_pool *pool, bem_font *font, const char *url);
+extern int bemFontComputeExtents(const bem_font *font, float size, const char *str, bem_rectangle *extents);
+extern void	bemFontDelete(bem_font *font);
+extern bem_font	*bemFontFindCached(bem_memory_pool *pool, const char *family, bem_font_stretch stretch, bem_font_style style, bem_font_variant variant, bem_font_weight weight);
+extern int bemFontGetAscent(bem_font *font);
+extern bem_rectangle *bemFontGetBounds(bem_font *font, bem_rectangle *bounds);
+extern bem_font	*bemFontGetCached(bem_memory_pool *pool, size_t index);
+extern size_t bemFontGetCachedCount(bem_memory_pool *pool);
+extern int bemFontGetCapHeight(bem_font *font);
+extern const int *bemFontGetCMap(bem_font *font, size_t *num_cmap);
+extern const char *bemFontGetCopyright(bem_font *font);
+extern int bemFontGetDescent(bem_font *font);
+extern bem_rectangle *bemFontGetExtents(bem_font *font, float size, const char *str, bem_rectangle *extents);
+extern const char *bemFontGetFamily(bem_font *font);
+extern size_t bemFontGetFontAmount(bem_font *font);
+extern const char *bemFontGetPostScriptName(bem_font *font);
+extern bem_font_style bemFontGetStyle(bem_font *font);
+extern const char *bemFontGetVersion(bem_font *font);
+extern bem_font_weight bemFontGetWeight(bem_font *font);
+extern int bemFontGetWidth(bem_font *font, int ch);
+extern int bemFontGetXHeight(bem_font *font);
+extern bool bemFontIsFixedPitch(bem_font *font);
+extern bem_font	*bemFontNew(bem_memory_pool *pool, bem_file *file, size_t index);
+
+// TODO: Add function declarations for html
