@@ -507,6 +507,30 @@ typedef struct {
 } bem_file;
 
 typedef struct {
+  char font_url[380];
+  char font_family[128];
+
+  unsigned char	font_style;
+  unsigned char	font_index;
+
+  unsigned short font_weight;
+} bem_font_cache;
+
+typedef struct {
+  const char *font_url;
+  const char *font_family;
+
+  size_t font_index;
+  
+  bem_font *font;
+
+  bem_font_stretch font_stretch;
+  bem_font_style font_style;
+  bem_font_variant font_variant;
+  bem_font_weight font_weight;
+} bem_font_info;
+
+typedef struct {
     struct lconv *locale;
     size_t locale_decimal_length;
 
@@ -514,7 +538,7 @@ typedef struct {
     size_t font_amount;
     size_t fonts_size;
     size_t font_index[256];
-    // TODO: font_info *fonts;
+    bem_font_info *fonts;
 
     size_t string_amount;
     size_t strings_size;
@@ -738,6 +762,44 @@ struct bem_node {
         char unknown[1];
     } value;
 };
+
+typedef struct {
+    short width;
+    short left_bearing;
+} bem_font_metric;
+
+typedef struct {
+    bem_memory_pool *pool;
+    
+    size_t index;
+    size_t fonts_amount;
+    
+    const char *copyright;
+    const char *family;
+    const char *postscript_name;
+    const char *version;
+    
+    bool is_fixed_width;
+    
+    int max_char;
+    int min_char;
+    
+    size_t cmap_amount;
+    int *cmap;
+    
+    bem_font_metric	*widths[262144 / 256]; // TODO: Make constant for this
+    
+    float units;
+    float italic_angle;
+
+    short ascent, descent;
+    short cap_height, x_height;
+    short x_max, x_min, y_max, y_min;
+	short weight;
+
+    bem_font_stretch stretch;
+    bem_font_style style;
+} bem_font;
 
 typedef int (*bem_comparison_function)(const void *, const void *);
 typedef bool (*bem_error_callback)(void *context, const char *message, int line_number);
