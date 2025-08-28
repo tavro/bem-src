@@ -441,20 +441,20 @@ typedef struct {
     bem_match match;
 
     const char *name, *value;
-} bem_css_selector_statement;
+} bem_stylesheet_selector_statement;
 
 typedef struct {
-    bem_css_selector *previous;
+    bem_stylesheet_selector *previous;
     bem_element element;
     bem_relation relation;
 
     size_t statement_amount;
-    bem_css_selector_statement *statements;
-} bem_css_selector;
+    bem_stylesheet_selector_statement *statements;
+} bem_stylesheet_selector;
 
 typedef struct {
     bem_sha3_256 hash;
-    bem_css_selector *selector;
+    bem_stylesheet_selector *selector;
     bem_dictionary *properties;
 } bem_rule_set;
 
@@ -573,7 +573,7 @@ typedef struct {
     int order;
     
     bem_rule_set *rule;
-} bem_css_match;
+} bem_stylesheet_match;
 
 typedef struct {
     float red;
@@ -809,16 +809,16 @@ extern bool	defaultErrorCallback(void *context, const char *message, int line_nu
 extern char	*defaultURLCallback(void *context, const char *url, char *buffer, size_t buffer_size);
 
 extern void	bemCSSImportString(bem_stylesheet *css, bem_dictionary *properties, const char *str);
-extern void	bemCSSSelectorAddStatement(bem_stylesheet *css, bem_css_selector *selector, bem_match match, const char *name, const char *value);
-extern void	bemCSSSelectorDelete(bem_css_selector *selector);
-extern void	bemCSSSelectorHash(bem_css_selector *selector, bem_sha3_256 hash);
-extern bem_css_selector *bemCSSSelectorNew(bem_stylesheet *css, bem_css_selector *previous, bem_element element, bem_relation relation);
+extern void	bemCSSSelectorAddStatement(bem_stylesheet *css, bem_stylesheet_selector *selector, bem_match match, const char *name, const char *value);
+extern void	bemCSSSelectorDelete(bem_stylesheet_selector *selector);
+extern void	bemCSSSelectorHash(bem_stylesheet_selector *selector, bem_sha3_256 hash);
+extern bem_stylesheet_selector *bemCSSSelectorNew(bem_stylesheet *css, bem_stylesheet_selector *previous, bem_element element, bem_relation relation);
 
 extern void	bemRuleCollectionAdd(bem_stylesheet *css, bem_rule_collection *collection, bem_rule_set *rule);
 extern void	bemRuleCollectionClear(bem_rule_collection *collection, int delete_rules);
 extern bem_rule_set *bemRuleCollectionFindHash(bem_rule_collection *collection, const bem_sha3_256 hash);
 extern void	bemRuleDelete(bem_rule_set *rule);
-extern bem_rule_set *bemRuleNew(bem_stylesheet *css, const bem_sha3_512 hash, bem_css_selector *selector, bem_dictionary *properties);
+extern bem_rule_set *bemRuleNew(bem_stylesheet *css, const bem_sha3_512 hash, bem_stylesheet_selector *selector, bem_dictionary *properties);
 
 extern void	bemCSSDelete(bem_stylesheet *css);
 extern bem_stylesheet *bemCSSNew(bem_memory_pool *pool);
@@ -892,4 +892,39 @@ extern int bemFontGetXHeight(bem_font *font);
 extern bool bemFontIsFixedPitch(bem_font *font);
 extern bem_font	*bemFontNew(bem_memory_pool *pool, bem_file *file, size_t index);
 
-// TODO: Add function declarations for html
+extern const char *bemElementString(bem_element element);
+extern bem_element bemElementValue(const char *str);
+extern void	bemHTMLDelete(bem_document *html);
+extern bem_node	*bemHTMLFindNode(bem_document *html, bem_node *current, bem_element element, const char *id);
+extern bem_stylesheet *bemHTMLGetCSS(bem_document *html);
+extern const char *bemHTMLGetDOCTYPE(bem_document *html);
+extern bem_node	*bemHTMLGetRootNode(bem_document *html);
+extern bool	bemHTMLImport(bem_document *html, bem_file_t *file);
+extern bem_html	*bemHTMLNew(bem_memory_pool *pool, bem_stylesheet *css);
+extern bem_node	*bemHTMLNewRootNode(bem_document *html, const char *doctype);
+extern void	bemHTMLSetErrorCallback(bem_document *html, bem_error_callback callback, void *cbdata);
+extern void	bemHTMLSetURLCallback(bem_document *html, bem_url_callback callback, void *cbdata);
+extern size_t bemNodeAttributeGetCount(bem_node *node);
+extern const char *bemNodeAttributeGetIndexNameValue(bem_node *node, size_t index, const char **name);
+extern const char *bemNodeAttributeGetNameValue(bem_node *node, const char *name);
+extern void	bemNodeAttributeRemove(bem_node *node, const char *name);
+extern void	bemNodeAttributeSetNameValue(bem_node *node, const char *name, const char *value);
+extern bool	bemNodeComputeCSSBox(bem_node *node, bem_compute compute, bem_box *box);
+extern char	*bemNodeComputeCSSContent(bem_node *node, bem_compute compute);
+extern bem_display bemNodeComputeCSSDisplay(bem_node *node, bem_compute compute);
+extern bool	bemNodeComputeCSSMedia(bem_node *node, bem_compute compute, bem_media *media);
+extern const bem_dict *bemNodeComputeCSSProperties(bem_node *node, bem_compute compute);
+extern bool bemNodeComputeCSSTable(bem_node *node, bem_compute compute, bem_table *table);
+extern bool	bemNodeComputeCSSText(bem_node *node, bem_compute compute, bem_text *text);
+extern void	bemNodeDelete(bem_document *html, bem_node *node);
+extern const char *bemNodeGetComment(bem_node *node);
+extern bem_element bemNodeGetElement(bem_node *node);
+extern bem_node	*bemNodeGetFirstChildNode(bem_node *node);
+extern bem_node	*bemNodeGetLastChildNode(bem_node *node);
+extern bem_node	*bemNodeGetNextSiblingNode(bem_node *node);
+extern bem_node	*bemNodeGetParentNode(bem_node *node);
+extern bem_node	*bemNodeGetPreviousSiblingNode(bem_node *node);
+extern const char *bemNodeGetString(bem_node *node);
+extern bem_node	*bemNodeNewComment(bem_node *parent, const char *c);
+extern bem_node	*bemNodeNewElement(bem_node *parent, bem_element element);
+extern bem_node	*bemNodeNewString(bem_node *parent, const char *s);
