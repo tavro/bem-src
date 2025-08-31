@@ -34,6 +34,28 @@
 #define BEM_SHA3_512_SIZE 64
 
 typedef enum {
+  BEM_LOGOP_NONE,
+  BEM_LOGOP_OR,
+  BEM_LOGOP_AND
+} bem_logop;
+
+typedef enum {
+  BEM_TYPE_ERROR,
+  BEM_TYPE_RESERVED,
+  BEM_TYPE_STRING,
+  BEM_TYPE_QSTRING,
+  BEM_TYPE_NUMBER
+} bem_type;
+
+static const char * const types[] = {
+  "ERROR",
+  "RESERVED",
+  "STRING",
+  "QSTRING",
+  "NUMBER"
+};
+
+typedef enum {
     FONT_STRECH_NORMAL,
     FONT_STRECH_ULTRA_CONDENCED,
     FONT_STRECH_EXTRA_CONDENCED,
@@ -928,3 +950,27 @@ extern const char *bemNodeGetString(bem_node *node);
 extern bem_node	*bemNodeNewComment(bem_node *parent, const char *c);
 extern bem_node	*bemNodeNewElement(bem_node *parent, bem_element element);
 extern bem_node	*bemNodeNewString(bem_node *parent, const char *s);
+
+extern bool	bemFileError(bem_file *file, const char *message, ...);
+
+extern bool	bemPoolError(bem_memory_pool *pool, int line_number, const char *message, ...);
+extern bool	bemPoolErrorv(bem_memory_pool *pool, int line_number, const char *message, va_list ap);
+
+extern void	bemPoolDeleteFonts(bem_memory_pool *pool);
+
+static int bem_compare_matches(bem_match *a, bem_match *b);
+static const bem_dict *bem_create_props(bem_node *node, bem_compute compute);
+static bool bem_get_color(bem_memory_pool *pool, const char *value, bem_color *color);
+static float bem_get_length(bem_memory_pool *pool, const char *value, float max_value, float multiplier, bem_stylesheet *css, bem_text *text);
+static int bem_match_node(bem_node *node, bem_stylesheet_selector *selector, const char *pseudo_class);
+static int bem_match_rule(bem_node *node, bem_rule_set *rule, const char *pseudo_class);
+static double bem_strtod(bem_memory_pool *pool, const char *str, char **end);
+
+static void	bem_add_rule(bem_stylesheet *css, bem_stylesheet_selector *selector, bem_dictionary *properties);
+static int bem_evaluate_media(bem_stylesheet *css, bem_file *file, bem_type *type, char *buffer, size_t buffer_size);
+static char	*bem_read(bem_file *file, bem_type *type, char *buffer, size_t buffer_size);
+static bem_dictionary *bem_read_properties(bem_stylesheet *css, bem_file *file, bem_dictionary *properties);
+static bem_stylesheet_selector *bem_read_selector(bem_stylesheet *css, bem_file *file, bem_type *type, char *buffer, size_t buffer_size);
+static char	*bem_read_value(bem_file *file, char *buffer, size_t buffer_size);
+
+static int bem_compare_rules(bem_rule_set **a, bem_rule_set **b);
