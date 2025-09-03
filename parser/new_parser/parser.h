@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+#include <sys/stat.h>
 #include <locale.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -56,27 +57,27 @@ static const char * const types[] = {
 };
 
 typedef enum {
-    FONT_STRECH_NORMAL,
-    FONT_STRECH_ULTRA_CONDENCED,
-    FONT_STRECH_EXTRA_CONDENCED,
-    FONT_STRECH_CONDENCED,
-    FONT_STRECH_SEMI_CONDENCED,
-    FONT_STRECH_ULTRA_EXPANDED,
-    FONT_STRECH_EXTRA_EXPANDED,
-    FONT_STRECH_EXPANDED,
-    FONT_STRECH_SEMI_EXPANDED
-} font_strech;
+    FONT_STRETCH_NORMAL,
+    FONT_STRETCH_ULTRA_CONDENCED,
+    FONT_STRETCH_EXTRA_CONDENCED,
+    FONT_STRETCH_CONDENCED,
+    FONT_STRETCH_SEMI_CONDENCED,
+    FONT_STRETCH_ULTRA_EXPANDED,
+    FONT_STRETCH_EXTRA_EXPANDED,
+    FONT_STRETCH_EXPANDED,
+    FONT_STRETCH_SEMI_EXPANDED
+} bem_font_stretch;
 
 typedef enum {
     FONT_STYLE_NORMAL,
     FONT_STYLE_ITALIC,
     FONT_STYLE_OBLIQUE
-} font_style;
+} bem_font_style;
 
 typedef enum {
     FONT_VARIANT_NORMAL,
     FONT_VARIANT_SMALL_CAPS
-} font_variant;
+} bem_font_variant;
 
 typedef enum {
     FONT_WEIGHT_NORMAL,
@@ -92,7 +93,7 @@ typedef enum {
     FONT_WEIGHT_700 = 700,
     FONT_WEIGHT_800 = 800,
     FONT_WEIGHT_900 = 900
-} font_weight;
+} bem_font_weight;
 
 typedef enum {
     BACKGROUND_ATTACHMENT_SCROLL,
@@ -433,8 +434,8 @@ typedef enum {
     MATCH_ATTRIBUTE_CONTAINS,
     MATCH_ATTRIBUTE_BEGINS,
     MATCH_ATTRIBUTE_ENDS,
-    MATCH_ATTRIBUTE_LANGUAGE
-    MATCH_ATTRIBUTE_SPACE
+    MATCH_ATTRIBUTE_LANGUAGE,
+    MATCH_ATTRIBUTE_SPACE,
     MATCH_CLASS,
     MATCH_ID,
     MATCH_PSEUDO_CLASS
@@ -452,6 +453,9 @@ typedef unsigned char bem_uchar;
 typedef unsigned char bem_sha3_256[BEM_SHA3_256_SIZE];
 typedef unsigned char bem_sha3_512[BEM_SHA3_512_SIZE];
 
+typedef bool (*bem_error_callback)(void *context, const char *message, int line_number);
+typedef char *(*bem_url_callback)(void *context, const char *url, char *buffer, size_t buffer_size);
+
 typedef struct {
     float left_offset;
     float top_offset;
@@ -466,7 +470,7 @@ typedef struct {
 } bem_stylesheet_selector_statement;
 
 typedef struct {
-    bem_stylesheet_selector *previous;
+    struct bem_stylesheet_selector *previous;
     bem_element element;
     bem_relation relation;
 
@@ -477,7 +481,7 @@ typedef struct {
 typedef struct {
     bem_sha3_256 hash;
     bem_stylesheet_selector *selector;
-    bem_dictionary *properties;
+    struct bem_dictionary *properties;
 } bem_rule_set;
 
 typedef struct {
@@ -489,7 +493,22 @@ typedef struct {
 } bem_rule_collection;
 
 typedef struct {
-    bem_memory_pool *pool;
+    float width;
+    float height;
+} bem_size;
+
+typedef struct {
+    const char *type;
+
+    int color_bits;
+    int monochrome_bits;
+
+    bem_rectangle margin;
+    bem_size size;
+} bem_media;
+
+typedef struct {
+   struct bem_memory_pool *pool;
     bem_media media;
     bem_rule_collection all_rules;
     bem_rule_collection rules[ELEMENT_MAX];
@@ -502,7 +521,7 @@ typedef struct {
 } bem_sha3;
 
 typedef struct {
-    bem_memory_pool *pool;
+    struct bem_memory_pool *pool;
     
     const char *format;
     
@@ -518,7 +537,7 @@ typedef struct {
 } bem_pair;
 
 typedef struct {
-    bem_memory_pool *pool;
+    struct bem_memory_pool *pool;
     const char *url;
 
     gzFile file_pointer;
@@ -537,6 +556,39 @@ typedef struct {
 
   unsigned short font_weight;
 } bem_font_cache;
+
+typedef struct {
+    struct bem_memory_pool *pool;
+    
+    size_t index;
+    size_t fonts_amount;
+    
+    const char *copyright;
+    const char *family;
+    const char *postscript_name;
+    const char *version;
+    
+    bool is_fixed_width;
+    
+    int max_char;
+    int min_char;
+    
+    size_t cmap_amount;
+    int *cmap;
+    
+    struct bem_font_metric *widths[262144 / 256]; // TODO: Make constant for this
+    
+    float units;
+    float italic_angle;
+
+    short ascent, descent;
+    short cap_height, x_height;
+    short x_max, x_min, y_max, y_min;
+	short weight;
+
+    bem_font_stretch stretch;
+    bem_font_style style;
+} bem_font;
 
 typedef struct {
   const char *font_url;
@@ -566,7 +618,7 @@ typedef struct {
     size_t strings_size;
     char **strings;
 
-    bem_dictionary *urls;
+    struct bem_dictionary *urls;
     bem_url_callback url_callback;
     void *url_context;
 
@@ -610,11 +662,6 @@ typedef struct {
 } bem_point;
 
 typedef struct {
-    float width;
-    float height;
-} bem_size;
-
-typedef struct {
     bem_color color;
     bem_border_style style;
     
@@ -652,7 +699,6 @@ typedef struct {
     bem_rectangle border_image_outset;
     bem_rectangle border_image_slice;
     bem_rectangle border_image_width;
-    bem_rectangle list_style_type;
     bem_rectangle margin;
     bem_rectangle padding;
 
@@ -705,16 +751,6 @@ typedef struct {
 } bem_box;
 
 typedef struct {
-    const char *type;
-
-    int color_bits;
-    int monochrome_bits;
-
-    bem_rectangle margin;
-    bem_size size;
-} bem_media;
-
-typedef struct {
     bem_border_collapse border_collapse;
     bem_caption_side caption_side;
     bem_empty_cells empty_cells;
@@ -751,7 +787,7 @@ typedef struct {
 typedef struct {
     bem_memory_pool *pool;
     bem_stylesheet *css;
-    bem_node *root;
+    struct bem_node *root;
     
     bem_error_callback error_callback;
     void *error_context;
@@ -760,19 +796,19 @@ typedef struct {
     void *url_context;
 } bem_document;
 
-struct bem_node {
+typedef struct {
     bem_element element;
 
-    bem_node *parent;
-    bem_node *previous;
-    bem_node *next;
+    struct bem_node *parent;
+    struct bem_node *previous;
+    struct bem_node *next;
 
     union {
         char comment[1];
 
         struct {
-            bem_node *first_child;
-            bem_node *last_child;
+            struct bem_node *first_child;
+            struct bem_node *last_child;
 
             bem_dictionary *attributes;
             const bem_dictionary *base_properties;
@@ -783,45 +819,12 @@ struct bem_node {
         char string[1];
         char unknown[1];
     } value;
-};
+} bem_node;
 
 typedef struct {
     short width;
     short left_bearing;
 } bem_font_metric;
-
-typedef struct {
-    bem_memory_pool *pool;
-    
-    size_t index;
-    size_t fonts_amount;
-    
-    const char *copyright;
-    const char *family;
-    const char *postscript_name;
-    const char *version;
-    
-    bool is_fixed_width;
-    
-    int max_char;
-    int min_char;
-    
-    size_t cmap_amount;
-    int *cmap;
-    
-    bem_font_metric	*widths[262144 / 256]; // TODO: Make constant for this
-    
-    float units;
-    float italic_angle;
-
-    short ascent, descent;
-    short cap_height, x_height;
-    short x_max, x_min, y_max, y_min;
-	short weight;
-
-    bem_font_stretch stretch;
-    bem_font_style style;
-} bem_font;
 
 typedef struct {
   unsigned tag;
@@ -886,8 +889,6 @@ typedef struct {
 } bem_off_post;
 
 typedef int (*bem_comparison_function)(const void *, const void *);
-typedef bool (*bem_error_callback)(void *context, const char *message, int line_number);
-typedef char *(*bem_url_callback)(void *context, const char *url, char *buffer, size_t buffer_size);
 
 extern bool	defaultErrorCallback(void *context, const char *message, int line_number);
 extern char	*defaultURLCallback(void *context, const char *url, char *buffer, size_t buffer_size);
@@ -983,7 +984,7 @@ extern bem_node	*bemHTMLFindNode(bem_document *html, bem_node *current, bem_elem
 extern bem_stylesheet *bemHTMLGetCSS(bem_document *html);
 extern const char *bemHTMLGetDOCTYPE(bem_document *html);
 extern bem_node	*bemHTMLGetRootNode(bem_document *html);
-extern bool	bemHTMLImport(bem_document *html, bem_file_t *file);
+extern bool	bemHTMLImport(bem_document *html, bem_file *file);
 extern bem_document	*bemHTMLNew(bem_memory_pool *pool, bem_stylesheet *css);
 extern bem_node	*bemHTMLNewRootNode(bem_document *html, const char *doctype);
 extern void	bemHTMLSetErrorCallback(bem_document *html, bem_error_callback callback, void *cbdata);
@@ -997,7 +998,7 @@ extern bool	bemNodeComputeCSSBox(bem_node *node, bem_compute compute, bem_box *b
 extern char	*bemNodeComputeCSSContent(bem_node *node, bem_compute compute);
 extern bem_display bemNodeComputeCSSDisplay(bem_node *node, bem_compute compute);
 extern bool	bemNodeComputeCSSMedia(bem_node *node, bem_compute compute, bem_media *media);
-extern const bem_dict *bemNodeComputeCSSProperties(bem_node *node, bem_compute compute);
+extern const bem_dictionary *bemNodeComputeCSSProperties(bem_node *node, bem_compute compute);
 extern bool bemNodeComputeCSSTable(bem_node *node, bem_compute compute, bem_table *table);
 extern bool	bemNodeComputeCSSText(bem_node *node, bem_compute compute, bem_text *text);
 extern void	bemNodeDelete(bem_document *html, bem_node *node);
@@ -1021,7 +1022,7 @@ extern bool	bemPoolErrorv(bem_memory_pool *pool, int line_number, const char *me
 extern void	bemPoolDeleteFonts(bem_memory_pool *pool);
 
 static int bemCompareMatches(bem_match *a, bem_match *b);
-static const bem_dict *bemCreateProperties(bem_node *node, bem_compute compute);
+static const bem_dictionary *bemCreateProperties(bem_node *node, bem_compute compute);
 static bool bemGetColor(bem_memory_pool *pool, const char *value, bem_color *color);
 static float bemGetLength(bem_memory_pool *pool, const char *value, float max_value, float multiplier, bem_stylesheet *css, bem_text *text);
 static int bemMatchNode(bem_node *node, bem_stylesheet_selector *selector, const char *pseudo_class);
@@ -1073,3 +1074,7 @@ static bool	bemReadTable(bem_file *file, size_t index, bem_off_table *table, siz
 static unsigned	bemReadUlong(bem_file *file);
 static int	bemReadUshort(bem_file *file);
 static unsigned	bemSeekTable(bem_file *file, bem_off_table *table, unsigned tag, unsigned offset);
+
+static bool	bemErrorCallback(void *context, const char *message, int line_number);
+static int bemTestPoolFunctions(bem_memory_pool *pool);
+static int bemTestSha3Functions(void);
