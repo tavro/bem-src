@@ -22,6 +22,88 @@
 
 #include "parser.h"
 
-int main(int argc, char *argv[]) {
+bool bemDefaultErrorCallback(void *context, const char *message, int line_number)
+{
+    (void)context;
+    (void)line_number;
+
+    fputs(message, stderr);
+    putc('\n', stderr);
+
+    return true;
+}
+
+char *bemDefaultURLCallback(void *context, const char *url, char *buffer, size_t buffer_size)
+{
+    (void)context;
+
+    if (!access(url, R_OK))
+    {
+        strncpy(buffer, url, buffer_size - 1);
+        buffer[buffer_size - 1] = '\0';
+    }
+    else if (!strncmp(url, "file:///", 8))
+    {
+        char *buffer_pointer, *buffer_end;
+
+        for (url += 7, buffer_pointer = buffer, buffer_end = buffer + buffer_size - 1; *url; url++)
+        {
+            int ch = *url;
+
+            if (ch == '%' && isxdigit(url[1] & 255) && isxdigit(url[2] & 255))
+            {
+                if (isdigit(url[1]))
+                {
+                    ch = (url[1] - '0') << 4;
+                }
+                else
+                {
+                    ch = (tolower(url[1]) - 'a' + 10) << 4;
+                }
+
+                if (isdigit(url[2]))
+                {
+                    ch |= (url[2] - '0');
+                }
+                else
+                {
+                    ch |= (tolower(url[2]) - 'a' + 10);
+                }
+
+                url += 2;
+            }
+
+            if (buffer_pointer < buffer_end)
+            {
+                *buffer_pointer++ = (char)ch;
+            }
+            else
+            {
+                errno = E2BIG;
+                *buffer = '\0';
+                return NULL;
+            }
+        }
+
+        *buffer_pointer = '\0';
+
+        if (access(buffer, R_OK))
+        {
+            *buffer = '\0';
+            return NULL;
+        }
+    }
+    else
+    {
+        errno = EINVAL;
+        *buffer = '\0';
+        return NULL;
+    }
+
+    return buffer;
+}
+
+int main(int argc, char *argv[])
+{
     return 0;
 }

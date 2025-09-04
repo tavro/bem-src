@@ -34,29 +34,31 @@
 #define BEM_SHA3_256_SIZE 32
 #define BEM_SHA3_512_SIZE 64
 
-typedef enum {
-  BEM_LOGOP_NONE,
-  BEM_LOGOP_OR,
-  BEM_LOGOP_AND
+typedef enum
+{
+    BEM_LOGOP_NONE,
+    BEM_LOGOP_OR,
+    BEM_LOGOP_AND
 } bem_logop;
 
-typedef enum {
-  BEM_TYPE_ERROR,
-  BEM_TYPE_RESERVED,
-  BEM_TYPE_STRING,
-  BEM_TYPE_QSTRING,
-  BEM_TYPE_NUMBER
+typedef enum
+{
+    BEM_TYPE_ERROR,
+    BEM_TYPE_RESERVED,
+    BEM_TYPE_STRING,
+    BEM_TYPE_QSTRING,
+    BEM_TYPE_NUMBER
 } bem_type;
 
-static const char * const types[] = {
-  "ERROR",
-  "RESERVED",
-  "STRING",
-  "QSTRING",
-  "NUMBER"
-};
+static const char *const types[] = {
+    "ERROR",
+    "RESERVED",
+    "STRING",
+    "QSTRING",
+    "NUMBER"};
 
-typedef enum {
+typedef enum
+{
     FONT_STRETCH_NORMAL,
     FONT_STRETCH_ULTRA_CONDENCED,
     FONT_STRETCH_EXTRA_CONDENCED,
@@ -68,18 +70,21 @@ typedef enum {
     FONT_STRETCH_SEMI_EXPANDED
 } bem_font_stretch;
 
-typedef enum {
+typedef enum
+{
     FONT_STYLE_NORMAL,
     FONT_STYLE_ITALIC,
     FONT_STYLE_OBLIQUE
 } bem_font_style;
 
-typedef enum {
+typedef enum
+{
     FONT_VARIANT_NORMAL,
     FONT_VARIANT_SMALL_CAPS
 } bem_font_variant;
 
-typedef enum {
+typedef enum
+{
     FONT_WEIGHT_NORMAL,
     FONT_WEIGHT_BOLD,
     FONT_WEIGHT_BOLDER,
@@ -95,37 +100,43 @@ typedef enum {
     FONT_WEIGHT_900 = 900
 } bem_font_weight;
 
-typedef enum {
+typedef enum
+{
     BACKGROUND_ATTACHMENT_SCROLL,
     BACKGROUND_ATTACHMENT_FIXED
 } bem_background_attachment;
 
-typedef enum {
+typedef enum
+{
     BACKGROUND_BOX_BORDER,
     BACKGROUND_BOX_PADDING,
     BACKGROUND_BOX_CONTENT
 } bem_background_box;
 
-typedef enum {
+typedef enum
+{
     BACKGROUND_REPEAT,
     BACKGROUND_REPEAT_NONE,
     BACKGROUND_REPEAT_X,
     BACKGROUND_REPEAT_Y
 } bem_background_repeat;
 
-typedef enum {
+typedef enum
+{
     BORDER_COLLAPSE_SEPARATE,
     BORDER_COLLAPSE_COLLAPSE
 } bem_border_collapse;
 
-typedef enum {
+typedef enum
+{
     BORDER_IMAGE_REPEAT_STRETCH,
     BORDER_IMAGE_REPEAT_REPEAT,
     BORDER_IMAGE_REPEAT_ROUND,
     BORDER_IMAGE_REPEAT_SPACE
 } bem_border_image_repeat;
 
-typedef enum {
+typedef enum
+{
     BORDER_STYLE_HIDDEN,
     BORDER_STYLE_NONE,
     BORDER_STYLE_DOTTED,
@@ -138,7 +149,8 @@ typedef enum {
     BORDER_STYLE_OUTSET
 } bem_border_style;
 
-typedef enum {
+typedef enum
+{
     BREAK_AUTO,
     BREAK_ALWAYS,
     BREAK_AVOID,
@@ -146,17 +158,20 @@ typedef enum {
     BREAK_RIGHT
 } bem_break;
 
-typedef enum {
+typedef enum
+{
     CAPTION_SIDE_TOP,
     CAPTION_SIDE_BOTTOM
 } bem_caption_side;
 
-typedef enum {
+typedef enum
+{
     DIRECTION_LEFT_TO_RIGHT,
     DIRECTION_RIGHT_TO_LEFT
 } bem_direction;
 
-typedef enum {
+typedef enum
+{
     DISPLAY_NONE,
     DISPLAY_BLOCK,
     DISPLAY_INLINE,
@@ -174,23 +189,27 @@ typedef enum {
     DISPLAY_TABLE_CELL
 } bem_display;
 
-typedef enum {
+typedef enum
+{
     EMPTY_CELLS_HIDE,
     EMPTY_CELLS_SHOW
 } bem_empty_cells;
 
-typedef enum {
+typedef enum
+{
     FLOAT_NONE,
     FLOAT_LEFT,
     FLOAT_RIGHT
 } bem_float;
 
-typedef enum {
+typedef enum
+{
     LIST_STYLE_POSITION_INSIDE,
     LIST_STYLE_POSITION_OUTSIDE
 } bem_list_style_position;
 
-typedef enum {
+typedef enum
+{
     LIST_STYLE_TYPE_DISC,
     LIST_STYLE_TYPE_CIRCLE,
     LIST_STYLE_TYPE_SQUARE,
@@ -207,46 +226,53 @@ typedef enum {
     LIST_STYLE_TYPE_NONE
 } bem_list_style_type;
 
-typedef enum {
+typedef enum
+{
     OVERFLOW_HIDDEN,
     OVERFLOW_VISIBLE,
     OVERFLOW_SCROLL,
     OVERFLOW_AUTO
 } bem_overflow;
 
-typedef enum {
+typedef enum
+{
     TABLE_LAYOUT_AUTO,
     TABLE_LAYOUT_FIXED
 } bem_table_layout;
 
-typedef enum {
+typedef enum
+{
     TEXT_ALIGN_LEFT,
     TEXT_ALIGN_RIGHT,
     TEXT_ALIGN_CENTER,
     TEXT_ALIGN_JUSTIFY
 } bem_text_align;
 
-typedef enum {
+typedef enum
+{
     TEXT_DECORATION_NONE,
     TEXT_DECORATION_UNDERLINE,
     TEXT_DECORATION_OVERLINE,
     TEXT_DECORATION_LINE_THROUGH
 } bem_text_decoration;
 
-typedef enum {
+typedef enum
+{
     TEXT_TRANSFORM_NONE,
     TEXT_TRANSFORM_CAPITALIZE,
     TEXT_TRANSFORM_LOWERCASE,
     TEXT_TRANSFORM_UPPERCASE
 } bem_text_transform;
 
-typedef enum {
+typedef enum
+{
     UNICODE_BIDIRECTIONAL_NORMAL,
     UNICODE_BIDIRECTIONAL_EMBED,
     UNICODE_BIDIRECTIONAL_OVERRIDE
 } bem_unicode_bidirectional;
 
-typedef enum {
+typedef enum
+{
     WHITE_SPACE_NORMAL,
     WHITE_SPACE_NO_WRAP,
     WHITE_SPACE_PRE,
@@ -254,7 +280,8 @@ typedef enum {
     WHITE_SPACE_PRE_WRAP
 } bem_white_space;
 
-typedef enum {
+typedef enum
+{
     ELEMENT_UNKNOWN = -2,
     ELEMENT_STRING = -1,
     ELEMENT_WILDCARD,
@@ -414,7 +441,8 @@ typedef enum {
     ELEMENT_MAX
 } bem_element;
 
-typedef enum {
+typedef enum
+{
     COMPUTE_BASE,
     COMPUTE_BEFORE,
     COMPUTE_AFTER,
@@ -422,13 +450,15 @@ typedef enum {
     COMPUTE_FIRST_LETTER
 } bem_compute;
 
-typedef enum {
+typedef enum
+{
     RESOLUTION_NONE,
     RESOLUTION_PER_INCH,
     RESOLUTION_PER_CM
 } bem_resolution;
 
-typedef enum {
+typedef enum
+{
     MATCH_ATTRIBUTE_EXIST,
     MATCH_ATTRIBUTE_EQUALS,
     MATCH_ATTRIBUTE_CONTAINS,
@@ -441,7 +471,8 @@ typedef enum {
     MATCH_PSEUDO_CLASS
 } bem_match;
 
-typedef enum {
+typedef enum
+{
     RELATION_CHILD,
     RELATION_IMMEDIATE_CHILD,
     RELATION_SIBLING,
@@ -456,20 +487,23 @@ typedef unsigned char bem_sha3_512[BEM_SHA3_512_SIZE];
 typedef bool (*bem_error_callback)(void *context, const char *message, int line_number);
 typedef char *(*bem_url_callback)(void *context, const char *url, char *buffer, size_t buffer_size);
 
-typedef struct {
+typedef struct
+{
     float left_offset;
     float top_offset;
     float right_offset;
     float bottom_offset;
 } bem_rectangle;
 
-typedef struct {
+typedef struct
+{
     bem_match match;
 
     const char *name, *value;
 } bem_stylesheet_selector_statement;
 
-typedef struct {
+typedef struct
+{
     struct bem_stylesheet_selector *previous;
     bem_element element;
     bem_relation relation;
@@ -478,13 +512,15 @@ typedef struct {
     bem_stylesheet_selector_statement *statements;
 } bem_stylesheet_selector;
 
-typedef struct {
+typedef struct
+{
     bem_sha3_256 hash;
     bem_stylesheet_selector *selector;
     struct bem_dictionary *properties;
 } bem_rule_set;
 
-typedef struct {
+typedef struct
+{
     int needs_sorting;
 
     size_t rules_size;
@@ -492,12 +528,14 @@ typedef struct {
     bem_rule_set **rules;
 } bem_rule_collection;
 
-typedef struct {
+typedef struct
+{
     float width;
     float height;
 } bem_size;
 
-typedef struct {
+typedef struct
+{
     const char *type;
 
     int color_bits;
@@ -507,36 +545,41 @@ typedef struct {
     bem_size size;
 } bem_media;
 
-typedef struct {
-   struct bem_memory_pool *pool;
+typedef struct
+{
+    struct bem_memory_pool *pool;
     bem_media media;
     bem_rule_collection all_rules;
     bem_rule_collection rules[ELEMENT_MAX];
 } bem_stylesheet;
 
-typedef struct {
+typedef struct
+{
     unsigned char bytes_used;
     unsigned char bytes_per_block;
     unsigned char state[200];
 } bem_sha3;
 
-typedef struct {
+typedef struct
+{
     struct bem_memory_pool *pool;
-    
+
     const char *format;
-    
+
     int width, height;
     int x_resolution, y_resolution;
 
     bem_resolution units;
 } bem_image;
 
-typedef struct {
+typedef struct
+{
     const char *key;
     const char *value;
 } bem_pair;
 
-typedef struct {
+typedef struct
+{
     struct bem_memory_pool *pool;
     const char *url;
 
@@ -547,64 +590,68 @@ typedef struct {
     int line_number;
 } bem_file;
 
-typedef struct {
-  char font_url[380];
-  char font_family[128];
+typedef struct
+{
+    char font_url[380];
+    char font_family[128];
 
-  unsigned char	font_style;
-  unsigned char	font_index;
+    unsigned char font_style;
+    unsigned char font_index;
 
-  unsigned short font_weight;
+    unsigned short font_weight;
 } bem_font_cache;
 
-typedef struct {
+typedef struct
+{
     struct bem_memory_pool *pool;
-    
+
     size_t index;
     size_t fonts_amount;
-    
+
     const char *copyright;
     const char *family;
     const char *postscript_name;
     const char *version;
-    
+
     bool is_fixed_width;
-    
+
     int max_char;
     int min_char;
-    
+
     size_t cmap_amount;
     int *cmap;
-    
+
     struct bem_font_metric *widths[262144 / 256]; // TODO: Make constant for this
-    
+
     float units;
     float italic_angle;
 
     short ascent, descent;
     short cap_height, x_height;
     short x_max, x_min, y_max, y_min;
-	short weight;
+    short weight;
 
     bem_font_stretch stretch;
     bem_font_style style;
 } bem_font;
 
-typedef struct {
-  const char *font_url;
-  const char *font_family;
+typedef struct
+{
+    const char *font_url;
+    const char *font_family;
 
-  size_t font_index;
-  
-  bem_font *font;
+    size_t font_index;
 
-  bem_font_stretch font_stretch;
-  bem_font_style font_style;
-  bem_font_variant font_variant;
-  bem_font_weight font_weight;
+    bem_font *font;
+
+    bem_font_stretch font_stretch;
+    bem_font_style font_style;
+    bem_font_variant font_variant;
+    bem_font_weight font_weight;
 } bem_font_info;
 
-typedef struct {
+typedef struct
+{
     struct lconv *locale;
     size_t locale_decimal_length;
 
@@ -627,48 +674,55 @@ typedef struct {
     char *last_error;
 } bem_memory_pool;
 
-typedef struct {
+typedef struct
+{
     bem_memory_pool *pool;
 
     size_t pair_amount;
     size_t pairs_size;
 
     bem_pair *pairs;
-} bem_dictionary; 
+} bem_dictionary;
 
-typedef struct {
+typedef struct
+{
     bem_element element;
     const char *attribute_name;
     const char *property_name, *property_value;
 } bem_attribute_mapping;
 
-typedef struct {
+typedef struct
+{
     int score;
     int order;
-    
+
     bem_rule_set *rule;
 } bem_stylesheet_match;
 
-typedef struct {
+typedef struct
+{
     float red;
     float green;
     float blue;
     float alpha;
 } bem_color;
 
-typedef struct {
+typedef struct
+{
     float horizontal_position;
     float vertical_position;
 } bem_point;
 
-typedef struct {
+typedef struct
+{
     bem_color color;
     bem_border_style style;
-    
+
     float width;
 } bem_border_properties;
 
-typedef struct {
+typedef struct
+{
     float horizontal_offset;
     float vertical_offset;
     float blur_radius;
@@ -679,21 +733,24 @@ typedef struct {
     bool inset;
 } bem_box_shadow;
 
-typedef struct {
+typedef struct
+{
     bem_border_properties left;
     bem_border_properties top;
     bem_border_properties right;
     bem_border_properties bottom;
 } bem_border;
 
-typedef struct {
+typedef struct
+{
     bem_size bottom_left;
     bem_size bottom_right;
     bem_size top_left;
     bem_size top_right;
 } bem_border_radius;
 
-typedef struct {
+typedef struct
+{
     bem_rectangle bounds;
     bem_rectangle clip;
     bem_rectangle border_image_outset;
@@ -750,14 +807,16 @@ typedef struct {
     bem_overflow overflow;
 } bem_box;
 
-typedef struct {
+typedef struct
+{
     bem_border_collapse border_collapse;
     bem_caption_side caption_side;
     bem_empty_cells empty_cells;
     bem_table_layout table_layout;
 } bem_table;
 
-typedef struct {
+typedef struct
+{
     bem_color color;
     bem_direction direction;
 
@@ -767,8 +826,8 @@ typedef struct {
     bem_font_variant font_variant;
     bem_font_weight font_weight;
 
-    const char* font_family;
-    const char* quotes[4];
+    const char *font_family;
+    const char *quotes[4];
 
     float font_size;
     float font_size_adjust;
@@ -776,7 +835,7 @@ typedef struct {
     float line_height;
     float text_indent;
     float word_spacing;
-    
+
     bem_text_align text_align;
     bem_text_decoration text_decoration;
     bem_text_transform text_transform;
@@ -784,11 +843,12 @@ typedef struct {
     bem_white_space white_space;
 } bem_text;
 
-typedef struct {
+typedef struct
+{
     bem_memory_pool *pool;
     bem_stylesheet *css;
     struct bem_node *root;
-    
+
     bem_error_callback error_callback;
     void *error_context;
 
@@ -796,17 +856,20 @@ typedef struct {
     void *url_context;
 } bem_document;
 
-typedef struct {
+typedef struct
+{
     bem_element element;
 
     struct bem_node *parent;
     struct bem_node *previous;
     struct bem_node *next;
 
-    union {
+    union
+    {
         char comment[1];
 
-        struct {
+        struct
+        {
             struct bem_node *first_child;
             struct bem_node *last_child;
 
@@ -815,151 +878,163 @@ typedef struct {
 
             bem_document *html;
         } element;
-        
+
         char string[1];
         char unknown[1];
     } value;
 } bem_node;
 
-typedef struct {
+typedef struct
+{
     short width;
     short left_bearing;
 } bem_font_metric;
 
-typedef struct {
-  unsigned tag;
-  unsigned checksum;
-  unsigned offset;
-  unsigned length;
+typedef struct
+{
+    unsigned tag;
+    unsigned checksum;
+    unsigned offset;
+    unsigned length;
 } bem_off_dir;
 
-typedef struct {
-  int num_entries;
-  bem_off_dir *entries;
+typedef struct
+{
+    int num_entries;
+    bem_off_dir *entries;
 } bem_off_table;
 
-typedef struct {
-  unsigned short platform_id, encoding_id, language_id, name_id;
-  unsigned short length, offset;
+typedef struct
+{
+    unsigned short platform_id, encoding_id, language_id, name_id;
+    unsigned short length, offset;
 } bem_off_name;
 
-typedef struct {
-  int num_names;
-  bem_off_name *names;
-  unsigned char *storage;
-  unsigned storage_size;
+typedef struct
+{
+    int num_names;
+    bem_off_name *names;
+    unsigned char *storage;
+    unsigned storage_size;
 } bem_off_names;
 
-typedef struct {
-  unsigned short start_code, end_code;
-  unsigned short id_range_offset;
-  short	id_delta;
+typedef struct
+{
+    unsigned short start_code, end_code;
+    unsigned short id_range_offset;
+    short id_delta;
 } bem_off_cmap4;
 
-typedef struct {
-  unsigned start_char_code, end_char_code;
-  unsigned start_glyph_id;
+typedef struct
+{
+    unsigned start_char_code, end_char_code;
+    unsigned start_glyph_id;
 } bem_off_cmap12;
 
-typedef struct {
-  unsigned start_char_code, end_char_code;
-  unsigned glyph_id;
+typedef struct
+{
+    unsigned start_char_code, end_char_code;
+    unsigned glyph_id;
 } bem_off_cmap13;
 
-typedef struct {
-  unsigned short units_per_em;
-  short	x_min, y_min, x_max, y_max;
-  unsigned short mac_style;
+typedef struct
+{
+    unsigned short units_per_em;
+    short x_min, y_min, x_max, y_max;
+    unsigned short mac_style;
 } bem_off_head;
 
-typedef struct {
-  short ascender, descender;
-  int number_of_horizontal_metrics;
+typedef struct
+{
+    short ascender, descender;
+    int number_of_horizontal_metrics;
 } bem_off_hhea;
 
-typedef struct {
-  unsigned short weight_class, width_class,	fs_type;
-  short	typo_ascender, typo_descender;
-  short x_height, cap_height;
+typedef struct
+{
+    unsigned short weight_class, width_class, fs_type;
+    short typo_ascender, typo_descender;
+    short x_height, cap_height;
 } bem_off_os_2;
 
-typedef struct {
-  float	italic_angle;
-  unsigned is_fixed_pitch;
+typedef struct
+{
+    float italic_angle;
+    unsigned is_fixed_pitch;
 } bem_off_post;
 
 typedef int (*bem_comparison_function)(const void *, const void *);
 
-extern bool	defaultErrorCallback(void *context, const char *message, int line_number);
-extern char	*defaultURLCallback(void *context, const char *url, char *buffer, size_t buffer_size);
+extern bool bemDefaultErrorCallback(void *context, const char *message, int line_number);
+extern char *bemDefaultURLCallback(void *context, const char *url, char *buffer, size_t buffer_size);
 
-extern void	bemCSSImportString(bem_stylesheet *css, bem_dictionary *properties, const char *str);
-extern void	bemCSSSelectorAddStatement(bem_stylesheet *css, bem_stylesheet_selector *selector, bem_match match, const char *name, const char *value);
-extern void	bemCSSSelectorDelete(bem_stylesheet_selector *selector);
-extern void	bemCSSSelectorHash(bem_stylesheet_selector *selector, bem_sha3_256 hash);
+extern void bemCSSImportString(bem_stylesheet *css, bem_dictionary *properties, const char *str);
+extern void bemCSSSelectorAddStatement(bem_stylesheet *css, bem_stylesheet_selector *selector, bem_match match, const char *name, const char *value);
+extern void bemCSSSelectorDelete(bem_stylesheet_selector *selector);
+extern void bemCSSSelectorHash(bem_stylesheet_selector *selector, bem_sha3_256 hash);
 extern bem_stylesheet_selector *bemCSSSelectorNew(bem_stylesheet *css, bem_stylesheet_selector *previous, bem_element element, bem_relation relation);
 
-extern void	bemRuleCollectionAdd(bem_stylesheet *css, bem_rule_collection *collection, bem_rule_set *rule);
-extern void	bemRuleCollectionClear(bem_rule_collection *collection, int delete_rules);
+extern void bemRuleCollectionAdd(bem_stylesheet *css, bem_rule_collection *collection, bem_rule_set *rule);
+extern void bemRuleCollectionClear(bem_rule_collection *collection, int delete_rules);
 extern bem_rule_set *bemRuleCollectionFindHash(bem_rule_collection *collection, const bem_sha3_256 hash);
-extern void	bemRuleDelete(bem_rule_set *rule);
+extern void bemRuleDelete(bem_rule_set *rule);
 extern bem_rule_set *bemRuleNew(bem_stylesheet *css, const bem_sha3_512 hash, bem_stylesheet_selector *selector, bem_dictionary *properties);
 
-extern void	bemCSSDelete(bem_stylesheet *css);
+extern void bemCSSDelete(bem_stylesheet *css);
 extern bem_stylesheet *bemCSSNew(bem_memory_pool *pool);
-extern bool	bemCSSImport(bem_stylesheet *css, bem_file *file);
-extern bool	bemCSSImportDefault(bem_stylesheet *css);
-extern void	bemCSSSetErrorCallback(bem_stylesheet *css, bem_error_callback callback, void *context);
-extern void	bemCSSSetURLCallback(bem_stylesheet *css, bem_url_callback callback, void *context);
+extern bool bemCSSImport(bem_stylesheet *css, bem_file *file);
+extern bool bemCSSImportDefault(bem_stylesheet *css);
+extern void bemCSSSetErrorCallback(bem_stylesheet *css, bem_error_callback callback, void *context);
+extern void bemCSSSetURLCallback(bem_stylesheet *css, bem_url_callback callback, void *context);
 extern int bemCSSSetMedia(bem_stylesheet *css, const char *type, int color_bits, int grayscale_bits, float width, float height);
 
 extern bem_dictionary *bemDictionaryCopy(const bem_dictionary *dictionary);
-extern void	bemDictionaryDelete(bem_dictionary *dictionary);
+extern void bemDictionaryDelete(bem_dictionary *dictionary);
 extern size_t bemDictionaryGetCount(const bem_dictionary *dictionary);
 extern const char *bemDictionaryGetIndexKeyValue(const bem_dictionary *dictionary, size_t index, const char **key);
 extern const char *bemDictionaryGetKeyValue(const bem_dictionary *dictionary, const char *key);
 extern bem_dictionary *bemDictionaryNew(bem_memory_pool *pool);
-extern void	bemDictionaryRemoveKey(bem_dictionary *dictionary, const char *key);
-extern void	bemDictionarySetKeyValue(bem_dictionary *dictionary, const char *key, const char *value);
+extern void bemDictionaryRemoveKey(bem_dictionary *dictionary, const char *key);
+extern void bemDictionarySetKeyValue(bem_dictionary *dictionary, const char *key, const char *value);
 
-extern void	bemFileDelete(bem_file *file);
+extern void bemFileDelete(bem_file *file);
 extern int bemFileGetc(bem_file *file);
-extern bem_file	*bemFileNewBuffer(bem_memory_pool *pool, const void *buffer, size_t bytes);
-extern bem_file	*bemFileNewString(bem_memory_pool *pool, const char *str);
-extern bem_file	*bemFileNewURL(bem_memory_pool *pool, const char *url, const char *base_url);
+extern bem_file *bemFileNewBuffer(bem_memory_pool *pool, const void *buffer, size_t bytes);
+extern bem_file *bemFileNewString(bem_memory_pool *pool, const char *str);
+extern bem_file *bemFileNewURL(bem_memory_pool *pool, const char *url, const char *base_url);
 extern size_t bemFileRead(bem_file *file, void *buffer, size_t bytes);
 extern size_t bemFileSeek(bem_file *file, size_t offset);
-extern void	bemFileUngetc(bem_file *file, int ch);
+extern void bemFileUngetc(bem_file *file, int ch);
 
-extern bool	bemNodeComputeCSSTextFont(bem_node *node, const bem_dictionary *properties, bem_text *text);
-extern bem_node	*bemNodeNewUnknown(bem_node *parent, const char *unknown);
+extern bool bemNodeComputeCSSTextFont(bem_node *node, const bem_dictionary *properties, bem_text *text);
+extern bem_node *bemNodeNewUnknown(bem_node *parent, const char *unknown);
 
-extern void	bemImageDelete(bem_image *image);
+extern void bemImageDelete(bem_image *image);
 extern const char *bemImageGetFormat(bem_image *image);
 extern int bemImageGetHeight(bem_image *image);
 extern bem_size bemImageGetSize(bem_image *image);
 extern int bemImageGetWidth(bem_image *image);
 extern bem_image *bemImageNew(bem_memory_pool *pool, bem_file *file);
 
-extern void	bemPoolDelete(bem_memory_pool *pool);
+extern void bemPoolDelete(bem_memory_pool *pool);
 extern const char *bemPoolGetLastError(bem_memory_pool *pool);
 extern const char *bemPoolGetString(bem_memory_pool *pool, const char *str);
 extern const char *bemPoolGetURL(bem_memory_pool *pool, const char *url, const char *base_url);
 extern bem_memory_pool *bemPoolNew(void);
-extern void	bemPoolSetErrorCallback(bem_memory_pool *pool, bem_error_callback callback, void *context);
-extern void	bemPoolSetURLCallback(bem_memory_pool *pool, bem_url_callback callback, void *context);
+extern void bemPoolSetErrorCallback(bem_memory_pool *pool, bem_error_callback callback, void *context);
+extern void bemPoolSetURLCallback(bem_memory_pool *pool, bem_url_callback callback, void *context);
 
-extern void	bemSHA3Final(bem_sha3 *context, unsigned char *hash, size_t hash_length);
-extern void	bemSHA3Init(bem_sha3 *context);
-extern void	bemSHA3Update(bem_sha3 *context, const void *data, size_t data_length);
+extern void bemSHA3Final(bem_sha3 *context, unsigned char *hash, size_t hash_length);
+extern void bemSHA3Init(bem_sha3 *context);
+extern void bemSHA3Update(bem_sha3 *context, const void *data, size_t data_length);
 
-extern void	bemFontAddCached(bem_memory_pool *pool, bem_font *font, const char *url);
+extern void bemFontAddCached(bem_memory_pool *pool, bem_font *font, const char *url);
 extern int bemFontComputeExtents(const bem_font *font, float size, const char *str, bem_rectangle *extents);
-extern void	bemFontDelete(bem_font *font);
-extern bem_font	*bemFontFindCached(bem_memory_pool *pool, const char *family, bem_font_stretch stretch, bem_font_style style, bem_font_variant variant, bem_font_weight weight);
+extern void bemFontDelete(bem_font *font);
+extern bem_font *bemFontFindCached(bem_memory_pool *pool, const char *family, bem_font_stretch stretch, bem_font_style style, bem_font_variant variant, bem_font_weight weight);
 extern int bemFontGetAscent(bem_font *font);
 extern bem_rectangle *bemFontGetBounds(bem_font *font, bem_rectangle *bounds);
-extern bem_font	*bemFontGetCached(bem_memory_pool *pool, size_t index);
+extern bem_font *bemFontGetCached(bem_memory_pool *pool, size_t index);
 extern size_t bemFontGetCachedCount(bem_memory_pool *pool);
 extern int bemFontGetCapHeight(bem_font *font);
 extern const int *bemFontGetCMap(bem_font *font, size_t *num_cmap);
@@ -975,51 +1050,51 @@ extern bem_font_weight bemFontGetWeight(bem_font *font);
 extern int bemFontGetWidth(bem_font *font, int ch);
 extern int bemFontGetXHeight(bem_font *font);
 extern bool bemFontIsFixedPitch(bem_font *font);
-extern bem_font	*bemFontNew(bem_memory_pool *pool, bem_file *file, size_t index);
+extern bem_font *bemFontNew(bem_memory_pool *pool, bem_file *file, size_t index);
 
 extern const char *bemElementString(bem_element element);
 extern bem_element bemElementValue(const char *str);
-extern void	bemHTMLDelete(bem_document *html);
-extern bem_node	*bemHTMLFindNode(bem_document *html, bem_node *current, bem_element element, const char *id);
+extern void bemHTMLDelete(bem_document *html);
+extern bem_node *bemHTMLFindNode(bem_document *html, bem_node *current, bem_element element, const char *id);
 extern bem_stylesheet *bemHTMLGetCSS(bem_document *html);
 extern const char *bemHTMLGetDOCTYPE(bem_document *html);
-extern bem_node	*bemHTMLGetRootNode(bem_document *html);
-extern bool	bemHTMLImport(bem_document *html, bem_file *file);
-extern bem_document	*bemHTMLNew(bem_memory_pool *pool, bem_stylesheet *css);
-extern bem_node	*bemHTMLNewRootNode(bem_document *html, const char *doctype);
-extern void	bemHTMLSetErrorCallback(bem_document *html, bem_error_callback callback, void *cbdata);
-extern void	bemHTMLSetURLCallback(bem_document *html, bem_url_callback callback, void *cbdata);
+extern bem_node *bemHTMLGetRootNode(bem_document *html);
+extern bool bemHTMLImport(bem_document *html, bem_file *file);
+extern bem_document *bemHTMLNew(bem_memory_pool *pool, bem_stylesheet *css);
+extern bem_node *bemHTMLNewRootNode(bem_document *html, const char *doctype);
+extern void bemHTMLSetErrorCallback(bem_document *html, bem_error_callback callback, void *cbdata);
+extern void bemHTMLSetURLCallback(bem_document *html, bem_url_callback callback, void *cbdata);
 extern size_t bemNodeAttributeGetCount(bem_node *node);
 extern const char *bemNodeAttributeGetIndexNameValue(bem_node *node, size_t index, const char **name);
 extern const char *bemNodeAttributeGetNameValue(bem_node *node, const char *name);
-extern void	bemNodeAttributeRemove(bem_node *node, const char *name);
-extern void	bemNodeAttributeSetNameValue(bem_node *node, const char *name, const char *value);
-extern bool	bemNodeComputeCSSBox(bem_node *node, bem_compute compute, bem_box *box);
-extern char	*bemNodeComputeCSSContent(bem_node *node, bem_compute compute);
+extern void bemNodeAttributeRemove(bem_node *node, const char *name);
+extern void bemNodeAttributeSetNameValue(bem_node *node, const char *name, const char *value);
+extern bool bemNodeComputeCSSBox(bem_node *node, bem_compute compute, bem_box *box);
+extern char *bemNodeComputeCSSContent(bem_node *node, bem_compute compute);
 extern bem_display bemNodeComputeCSSDisplay(bem_node *node, bem_compute compute);
-extern bool	bemNodeComputeCSSMedia(bem_node *node, bem_compute compute, bem_media *media);
+extern bool bemNodeComputeCSSMedia(bem_node *node, bem_compute compute, bem_media *media);
 extern const bem_dictionary *bemNodeComputeCSSProperties(bem_node *node, bem_compute compute);
 extern bool bemNodeComputeCSSTable(bem_node *node, bem_compute compute, bem_table *table);
-extern bool	bemNodeComputeCSSText(bem_node *node, bem_compute compute, bem_text *text);
-extern void	bemNodeDelete(bem_document *html, bem_node *node);
+extern bool bemNodeComputeCSSText(bem_node *node, bem_compute compute, bem_text *text);
+extern void bemNodeDelete(bem_document *html, bem_node *node);
 extern const char *bemNodeGetComment(bem_node *node);
 extern bem_element bemNodeGetElement(bem_node *node);
-extern bem_node	*bemNodeGetFirstChildNode(bem_node *node);
-extern bem_node	*bemNodeGetLastChildNode(bem_node *node);
-extern bem_node	*bemNodeGetNextSiblingNode(bem_node *node);
-extern bem_node	*bemNodeGetParentNode(bem_node *node);
-extern bem_node	*bemNodeGetPreviousSiblingNode(bem_node *node);
+extern bem_node *bemNodeGetFirstChildNode(bem_node *node);
+extern bem_node *bemNodeGetLastChildNode(bem_node *node);
+extern bem_node *bemNodeGetNextSiblingNode(bem_node *node);
+extern bem_node *bemNodeGetParentNode(bem_node *node);
+extern bem_node *bemNodeGetPreviousSiblingNode(bem_node *node);
 extern const char *bemNodeGetString(bem_node *node);
-extern bem_node	*bemNodeNewComment(bem_node *parent, const char *c);
-extern bem_node	*bemNodeNewElement(bem_node *parent, bem_element element);
-extern bem_node	*bemNodeNewString(bem_node *parent, const char *s);
+extern bem_node *bemNodeNewComment(bem_node *parent, const char *c);
+extern bem_node *bemNodeNewElement(bem_node *parent, bem_element element);
+extern bem_node *bemNodeNewString(bem_node *parent, const char *s);
 
-extern bool	bemFileError(bem_file *file, const char *message, ...);
+extern bool bemFileError(bem_file *file, const char *message, ...);
 
-extern bool	bemPoolError(bem_memory_pool *pool, int line_number, const char *message, ...);
-extern bool	bemPoolErrorv(bem_memory_pool *pool, int line_number, const char *message, va_list ap);
+extern bool bemPoolError(bem_memory_pool *pool, int line_number, const char *message, ...);
+extern bool bemPoolErrorv(bem_memory_pool *pool, int line_number, const char *message, va_list ap);
 
-extern void	bemPoolDeleteFonts(bem_memory_pool *pool);
+extern void bemPoolDeleteFonts(bem_memory_pool *pool);
 
 static int bemCompareMatches(bem_match *a, bem_match *b);
 static const bem_dictionary *bemCreateProperties(bem_node *node, bem_compute compute);
@@ -1029,52 +1104,52 @@ static int bemMatchNode(bem_node *node, bem_stylesheet_selector *selector, const
 static int bemMatchRule(bem_node *node, bem_rule_set *rule, const char *pseudo_class);
 static double bemStrtod(bem_memory_pool *pool, const char *str, char **end);
 
-static void	bemAddRule(bem_stylesheet *css, bem_stylesheet_selector *selector, bem_dictionary *properties);
+static void bemAddRule(bem_stylesheet *css, bem_stylesheet_selector *selector, bem_dictionary *properties);
 static int bemEvaluateMedia(bem_stylesheet *css, bem_file *file, bem_type *type, char *buffer, size_t buffer_size);
-static char	*bemRead(bem_file *file, bem_type *type, char *buffer, size_t buffer_size);
+static char *bemRead(bem_file *file, bem_type *type, char *buffer, size_t buffer_size);
 static bem_dictionary *bemReadProperties(bem_stylesheet *css, bem_file *file, bem_dictionary *properties);
 static bem_stylesheet_selector *bemReadSelector(bem_stylesheet *css, bem_file *file, bem_type *type, char *buffer, size_t buffer_size);
-static char	*bemReadValue(bem_file *file, char *buffer, size_t buffer_size);
+static char *bemReadValue(bem_file *file, char *buffer, size_t buffer_size);
 
 static int bemCompareRules(bem_rule_set **a, bem_rule_set **b);
 static int bemComparePairs(bem_pair *a, bem_pair *b);
 
-static void	bemAddFont(bem_memory_pool *pool, bem_font *font, const char *url, bool delete_it);
+static void bemAddFont(bem_memory_pool *pool, bem_font *font, const char *url, bool delete_it);
 static int bemCompareInfo(bem_font_info *a, bem_font_info *b);
-static void	bemGetCname(char *cname, size_t cname_size);
-static void	bemLoadAllFonts(bem_memory_pool *pool);
-static bool	bemLoadCache(bem_memory_pool *pool, const char *cname, struct stat *cinfo);
+static void bemGetCname(char *cname, size_t cname_size);
+static void bemLoadAllFonts(bem_memory_pool *pool);
+static bool bemLoadCache(bem_memory_pool *pool, const char *cname, struct stat *cinfo);
 static time_t bemLoadFonts(bem_memory_pool *pool, const char *d, bool scan_only);
-static void	bemSaveCache(bem_memory_pool *pool, const char *cname);
-static void	bemSortFonts(bem_memory_pool *pool);
+static void bemSaveCache(bem_memory_pool *pool, const char *cname);
+static void bemSortFonts(bem_memory_pool *pool);
 
-static bem_node	*bemHtmlWalkNext(bem_node *current);
-static int	bemHtmlParseAttribute(bem_file *file, int ch, bem_node *node);
-static bool	bemHtmlParseComment(bem_file *file, bem_node **parent);
-static bool	bemHtmlParseDoctype(bem_file *file, bem_document *html, bem_node **parent);
-static bool	bemHtmlParseElement(bem_file *file, int ch, bem_document *html, bem_node **parent);
-static bool	bemHtmlParseUnknown(bem_file *file, bem_node **parent, const char *unknown);
-static void	bemHtmlDelete(bem_node *node);
+static bem_node *bemHtmlWalkNext(bem_node *current);
+static int bemHtmlParseAttribute(bem_file *file, int ch, bem_node *node);
+static bool bemHtmlParseComment(bem_file *file, bem_node **parent);
+static bool bemHtmlParseDoctype(bem_file *file, bem_document *html, bem_node **parent);
+static bool bemHtmlParseElement(bem_file *file, int ch, bem_document *html, bem_node **parent);
+static bool bemHtmlParseUnknown(bem_file *file, bem_node **parent, const char *unknown);
+static void bemHtmlDelete(bem_node *node);
 static bem_node *bemHtmlNew(bem_node *parent, bem_element element, const char *str);
-static void	bemHtmlRemove(bem_node *node);
+static void bemHtmlRemove(bem_node *node);
 
 static int bemCompareStrings(char **a, char **b);
 
 static const char *bemCopyName(bem_memory_pool *pool, bem_off_names *names, unsigned name_id);
-static int	bemReadCmap(bem_file *file, bem_off_table *table, int **cmap);
-static bool	bemReadHead(bem_file *file, bem_off_table *table, bem_off_head *head);
-static bool	bemReadHhea(bem_file *file, bem_off_table *table, bem_off_hhea *hhea);
+static int bemReadCmap(bem_file *file, bem_off_table *table, int **cmap);
+static bool bemReadHead(bem_file *file, bem_off_table *table, bem_off_head *head);
+static bool bemReadHhea(bem_file *file, bem_off_table *table, bem_off_hhea *hhea);
 static bem_font_metric *bemReadHmtx(bem_file *file, bem_off_table *table, bem_off_hhea *hhea);
-static int	bemReadMaxp(bem_file *file, bem_off_table *table);
-static bool	bemReadNames(bem_file *file, bem_off_table *table, bem_off_names *names);
-static bool	bemReadOs2(bem_file *file, bem_off_table *table, bem_off_os_2 *os_2);
-static bool	bemReadPost(bem_file *file, bem_off_table *table, bem_off_post *post);
-static int	bemReadShort(bem_file *file);
-static bool	bemReadTable(bem_file *file, size_t index, bem_off_table *table, size_t *num_fonts);
-static unsigned	bemReadUlong(bem_file *file);
-static int	bemReadUshort(bem_file *file);
-static unsigned	bemSeekTable(bem_file *file, bem_off_table *table, unsigned tag, unsigned offset);
+static int bemReadMaxp(bem_file *file, bem_off_table *table);
+static bool bemReadNames(bem_file *file, bem_off_table *table, bem_off_names *names);
+static bool bemReadOs2(bem_file *file, bem_off_table *table, bem_off_os_2 *os_2);
+static bool bemReadPost(bem_file *file, bem_off_table *table, bem_off_post *post);
+static int bemReadShort(bem_file *file);
+static bool bemReadTable(bem_file *file, size_t index, bem_off_table *table, size_t *num_fonts);
+static unsigned bemReadUlong(bem_file *file);
+static int bemReadUshort(bem_file *file);
+static unsigned bemSeekTable(bem_file *file, bem_off_table *table, unsigned tag, unsigned offset);
 
-static bool	bemErrorCallback(void *context, const char *message, int line_number);
+static bool bemErrorCallback(void *context, const char *message, int line_number);
 static int bemTestPoolFunctions(bem_memory_pool *pool);
 static int bemTestSha3Functions(void);
