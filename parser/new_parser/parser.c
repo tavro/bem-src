@@ -103,6 +103,152 @@ char *bemDefaultURLCallback(void *context, const char *url, char *buffer, size_t
     return buffer;
 }
 
+bem_dictionary *bemDictionaryCopy(const bem_dictionary *dictionary)
+{
+    bem_dictionary *new_dictionary;
+
+    if (!dictionary)
+        return NULL;
+    if ((new_dictionary = calloc(1, sizeof(bem_dictionary))) == NULL)
+        return NULL;
+
+    new_dictionary->pool = dictionary->pool;
+    new_dictionary->pair_amount = dictionary->pair_amount;
+    new_dictionary->pairs_size = dictionary->pairs_size;
+
+    if ((new_dictionary->pairs = calloc(new_dictionary->pair_amount, sizeof(bem_pair))) == NULL)
+    {
+        free(new_dictionary);
+        return NULL;
+    }
+
+    memcpy(new_dictionary->pairs, dictionary->pairs, new_dictionary->pair_amount * sizeof(bem_pair));
+
+    return new_dictionary;
+}
+
+void bemDictionaryDelete(bem_dictionary *dictionary)
+{
+    if (dictionary)
+    {
+        if (dictionary->pairs)
+            free(dictionary->pairs);
+        free(dictionary);
+    }
+}
+
+size_t bemDictionaryGetCount(const bem_dictionary *dictionary)
+{
+    return (dictionary ? dictionary->pair_amount : 0);
+}
+
+const char *bemDictionaryGetIndexKeyValue(const bem_dictionary *dictionary, size_t index, const char **key)
+{
+    if (!dictionary || index >= dictionary->pair_amount || !key)
+        return NULL;
+
+    *key = dictionary->pairs[index].key;
+
+    return dictionary->pairs[index].value;
+}
+
+const char *bemDictionaryGetKeyValue(const bem_dictionary *dictionary, const char *key)
+{
+    bem_pair temp, *ptr;
+
+    if (!dictionary || dictionary->pair_amount == 0)
+        return NULL;
+
+    temp.key = key;
+    temp.value = NULL;
+
+    if ((ptr = (bem_pair *)bsearch(&temp, dictionary->pairs, dictionary->pair_amount, sizeof(bem_pair), (bem_comparison_function)bemComparePairs)) != NULL)
+    {
+        return ptr->value;
+    }
+
+    return NULL;
+}
+
+bem_dictionary *bemDictionaryNew(bem_memory_pool *pool)
+{
+    bem_dictionary *dictionary;
+
+    if ((dictionary = (bem_dictionary *)calloc(1, sizeof(bem_dictionary))) != NULL)
+        dictionary->pool = pool;
+
+    return dictionary;
+}
+
+void bemDictionaryRemoveKey(bem_dictionary *dictionary, const char *key)
+{
+    bem_pair temp, *ptr;
+    size_t index;
+
+    if (!dictionary || dictionary->pair_amount == 0)
+        return;
+
+    temp.key = key;
+    temp.value = NULL;
+
+    if ((ptr = (bem_pair *)bsearch(&temp, dictionary->pairs, dictionary->pair_amount, sizeof(bem_pair), (bem_comparison_function)bemComparePairs)) != NULL)
+    {
+        dictionary->pair_amount--;
+
+        index = (size_t)(ptr - dictionary->pairs);
+
+        if (index < dictionary->pair_amount)
+            memmove(ptr, ptr + 1, (dictionary->pair_amount - index) * sizeof(bem_pair));
+    }
+}
+
+void bemDictionarySetKeyValue(bem_dictionary *dictionary, const char *key, const char *value)
+{
+    bem_pair temp, *ptr = NULL;
+
+    if (!dictionary)
+    {
+        return;
+    }
+    else if (dictionary->pair_amount == 1 && !strcmp(dictionary->pairs[0].key, key))
+    {
+        ptr = dictionary->pairs;
+    }
+    else if (dictionary->pair_amount > 1)
+    {
+        temp.key = key;
+        ptr = (bem_pair *)bsearch(&temp, dictionary->pairs, dictionary->pair_amount, sizeof(bem_pair), (bem_comparison_function)bemComparePairs);
+    }
+
+    if (ptr)
+    {
+        // TODO: ptr->value = bemPoolGetString(dictionary->pool, value);
+        return;
+    }
+
+    if (dictionary->pair_amount >= dictionary->pairs_size)
+    {
+        if ((ptr = realloc(dictionary->pairs, (dictionary->pairs_size + 4) * sizeof(bem_pair))) == NULL)
+            return;
+
+        dictionary->pairs_size += 4;
+        dictionary->pairs = ptr;
+    }
+
+    ptr = dictionary->pairs + dictionary->pair_amount;
+    dictionary->pair_amount++;
+
+    // TODO: ptr->key = bemPoolGetString(dictionary->pool, key);
+    // TODO: ptr->value = bemPoolGetString(dictionary->pool, value);
+
+    qsort(dictionary->pairs, dictionary->pair_amount, sizeof(bem_pair), (bem_comparison_function)bemComparePairs);
+}
+
+static int bemComparePairs(bem_pair *a, bem_pair *b)
+{
+    return strcasecmp(a->key, b->key);
+}
+
 int main(int argc, char *argv[])
 {
     return 0;
