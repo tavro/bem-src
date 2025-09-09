@@ -222,7 +222,7 @@ void bemDictionarySetKeyValue(bem_dictionary *dictionary, const char *key, const
 
     if (ptr)
     {
-        // TODO: ptr->value = bemPoolGetString(dictionary->pool, value);
+        ptr->value = bemPoolGetString(dictionary->pool, value);
         return;
     }
 
@@ -238,8 +238,8 @@ void bemDictionarySetKeyValue(bem_dictionary *dictionary, const char *key, const
     ptr = dictionary->pairs + dictionary->pair_amount;
     dictionary->pair_amount++;
 
-    // TODO: ptr->key = bemPoolGetString(dictionary->pool, key);
-    // TODO: ptr->value = bemPoolGetString(dictionary->pool, value);
+    ptr->key = bemPoolGetString(dictionary->pool, key);
+    ptr->value = bemPoolGetString(dictionary->pool, value);
 
     qsort(dictionary->pairs, dictionary->pair_amount, sizeof(bem_pair), (bem_comparison_function)bemComparePairs);
 }
@@ -249,7 +249,226 @@ static int bemComparePairs(bem_pair *a, bem_pair *b)
     return strcasecmp(a->key, b->key);
 }
 
+void bemPoolDelete(bem_memory_pool *pool)
+{
+    if (pool)
+    {
+        // TODO: if (pool->font_amount > 0) bemPoolDeleteFonts(pool);
+
+        if (pool->font_amount > 0)
+        {
+            size_t i;
+            char **temp;
+
+            for (i = pool->string_amount, temp = pool->strings; i > 0; i--, temp++)
+                free(*temp);
+
+            free(pool->strings);
+        }
+
+        free(pool->last_error);
+        free(pool);
+    }
+}
+
+bool bemPoolError(bem_memory_pool *pool, int line_number, const char *message, ...)
+{
+    bool result;
+
+    va_list ap;
+    va_start(ap, message);
+    result = bemPoolErrorv(pool, line_number, message, ap);
+    va_end(ap);
+
+    return result;
+}
+
+bool bemPoolErrorv(bem_memory_pool *pool, int line_number, const char *message, va_list ap)
+{
+    char buffer[8192];
+
+    vsnprintf(buffer, sizeof(buffer), message, ap);
+    free(pool->last_error);
+    pool->last_error = strdup(buffer);
+
+    return (pool->error_callback)(pool->error_context, buffer, line_number);
+}
+
+const char *bemPoolGetLastError(bem_memory_pool *pool)
+{
+    return pool ? pool->last_error : NULL;
+}
+
+const char *bemPoolGetString(bem_memory_pool *pool, const char *str)
+{
+    char *news, **temp;
+
+    if (!pool || !str)
+    {
+        return NULL;
+    }
+    else if (!*str)
+    {
+        return "";
+    }
+
+    if (pool->string_amount == 1 && !strcmp(pool->strings[0], str))
+    {
+        return pool->strings[0];
+    }
+    else if (pool->string_amount > 1)
+    {
+        if ((temp = bsearch(&str, pool->strings, pool->string_amount, sizeof(char *), (bem_comparison_function)bemCompareStrings)) != NULL)
+        {
+            return *temp;
+        }
+    }
+
+    if (pool->string_amount >= pool->strings_size)
+    {
+        if ((temp = realloc(pool->strings, (pool->strings_size + 32) * sizeof(char *))) == NULL)
+            return NULL;
+
+        pool->strings_size += 32;
+        pool->strings = temp;
+    }
+
+    temp = pool->strings + pool->string_amount;
+    *temp = news = strdup(str);
+    pool->string_amount++;
+
+    if (pool->string_amount > 1)
+        qsort(pool->strings, pool->string_amount, sizeof(char *), (bem_comparison_function)bemCompareStrings);
+
+    return news;
+}
+
+const char *bemPoolGetURL(bem_memory_pool *pool, const char *url, const char *base_url)
+{
+    const char *mapped;
+    char *ptr, temp[1024], new_url[1024];
+
+    if (*url == '/')
+    {
+        if (!base_url)
+        {
+            return bemPoolGetString(pool, url);
+        }
+        else if (!strncmp(base_url, "http://", 7))
+        {
+            strncpy(temp, base_url, sizeof(temp) - 1);
+            temp[sizeof(temp) - 1] = '\0';
+
+            if ((ptr = strchr(temp + 7, '/')) != NULL)
+                *ptr = '\0';
+
+            snprintf(new_url, sizeof(new_url), "%s%s", temp, url);
+            url = new_url;
+        }
+        else if (!strncmp(base_url, "https://", 8))
+        {
+            strncpy(temp, base_url, sizeof(temp) - 1);
+            temp[sizeof(temp) - 1] = '\0';
+
+            if ((ptr = strchr(temp + 8, '/')) != NULL)
+                *ptr = '\0';
+
+            snprintf(new_url, sizeof(new_url), "%s%s", temp, url);
+            url = new_url;
+        }
+        else
+        {
+            return bemPoolGetString(pool, url);
+        }
+    }
+    else if (strncmp(url, "http://", 7) && strncmp(url, "https://", 8))
+    {
+        if (!base_url)
+        {
+            getcwd(temp, sizeof(temp));
+            snprintf(new_url, sizeof(new_url), "%s/%s", temp, url);
+
+            return bemPoolGetString(pool, new_url);
+        }
+        else
+        {
+            strncpy(temp, base_url, sizeof(temp) - 1);
+            temp[sizeof(temp) - 1] = '\0';
+
+            if ((ptr = strrchr(temp, '/')) != NULL)
+                *ptr = '\0';
+
+            snprintf(new_url, sizeof(new_url), "%s/%s", temp, url);
+
+            if (new_url[0] == '/')
+                return (bemPoolGetString(pool, new_url));
+
+            url = new_url;
+        }
+    }
+
+    if ((mapped = (pool->url_callback)(pool->url_context, url, temp, sizeof(temp))) != NULL)
+    {
+        if (!pool->urls)
+            pool->urls = bemDictionaryNew(pool);
+
+        bemDictionarySetKeyValue(pool->urls, url, temp);
+        mapped = bemPoolGetString(pool, temp);
+    }
+
+    return (mapped);
+}
+
+bem_memory_pool *bemPoolNew(void)
+{
+    bem_memory_pool *pool = (bem_memory_pool *)calloc(1, sizeof(bem_memory_pool));
+
+    if (pool)
+    {
+        if ((pool->locale = localeconv()) != NULL)
+        {
+            if (!pool->locale->decimal_point || !strcmp(pool->locale->decimal_point, "."))
+            {
+                pool->locale = NULL;
+            }
+            else
+            {
+                pool->locale_decimal_length = strlen(pool->locale->decimal_point);
+            }
+        }
+
+        pool->error_callback = bemDefaultErrorCallback;
+        pool->url_callback = bemDefaultURLCallback;
+    }
+
+    return (pool);
+}
+
+void bemPoolSetErrorCallback(bem_memory_pool *pool, bem_error_callback callback, void *context)
+{
+    if (!pool)
+        return;
+
+    pool->error_callback = callback ? callback : bemDefaultErrorCallback;
+    pool->error_context = context;
+}
+
+void bemPoolSetURLCallback(bem_memory_pool *pool, bem_url_callback callback, void *context)
+{
+    if (!pool)
+        return;
+
+    pool->url_callback = callback ? callback : bemDefaultURLCallback;
+    pool->url_context = context;
+}
+
+static int bemCompareStrings(char **a, char **b)
+{
+    return (strcmp(*a, *b));
+}
+
 int main(int argc, char *argv[])
 {
+    // TODO: Fix compiler warnings
     return 0;
 }
