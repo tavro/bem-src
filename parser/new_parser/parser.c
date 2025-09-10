@@ -467,6 +467,60 @@ static int bemCompareStrings(char **a, char **b)
     return (strcmp(*a, *b));
 }
 
+void bemImageDelete(bem_image *image)
+{
+    free(image);
+}
+
+const char *bemImageGetFormat(bem_image *image)
+{
+    return (image ? image->format : NULL);
+}
+
+int bemImageGetHeight(bem_image *image)
+{
+    return (image ? image->height : 0);
+}
+
+bem_size bemImageGetSize(bem_image *image)
+{
+    bem_size size;
+
+    if (image)
+    {
+        if (image->x_resolution > 0 && image->y_resolution > 0 && image->units != RESOLUTION_NONE)
+        {
+            if (image->units == RESOLUTION_PER_INCH)
+            {
+                size.width = 72.0f * image->width / image->x_resolution;
+                size.height = 72.0f * image->height / image->y_resolution;
+            }
+            else
+            {
+                size.width = 72.0f / 2.54f * image->width / image->x_resolution;
+                size.height = 72.0f / 2.54f * image->height / image->y_resolution;
+            }
+        }
+        else
+        {
+            size.width = 0.72f * image->width;
+            size.height = 0.72f * image->height;
+        }
+    }
+    else
+    {
+        size.width = 0.0f;
+        size.height = 0.0f;
+    }
+
+    return (size);
+}
+
+int bemImageGetWidth(bem_image *image)
+{
+    return (image ? image->width : 0);
+}
+
 int main(int argc, char *argv[])
 {
     // TODO: Fix compiler warnings
