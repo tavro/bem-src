@@ -521,6 +521,145 @@ int bemImageGetWidth(bem_image *image)
     return (image ? image->width : 0);
 }
 
+bem_image *bemImageNew(bem_memory_pool *pool, bem_file *file)
+{
+    bem_image *image;
+    unsigned char buffer[2048];
+    size_t bytes;
+
+    if (!pool || !file)
+        return NULL;
+
+    if ((image = (bem_image *)calloc(1, sizeof(bem_image))) == NULL)
+        return NULL;
+
+    image->pool = pool;
+
+    // TODO: bytes = bemFileRead(file, buffer, sizeof(buffer));
+
+    if (bytes > 27 && !memcmp(buffer, "\211PNG\015\012\032\012\000\000\000\015IHDR", 16))
+    {
+        image->format = "image/png";
+        image->width = (buffer[16] << 24) | (buffer[17] << 16) | (buffer[18] << 8) | buffer[19];
+        image->height = (buffer[20] << 24) | (buffer[21] << 16) | (buffer[22] << 8) | buffer[23];
+    }
+    else if (bytes > 12 && (!memcmp(buffer, "GIF87a", 6) || !memcmp(buffer, "GIF89a", 6)))
+    {
+        image->format = "image/gif";
+        image->width = (buffer[7] << 8) | buffer[6];
+        image->height = (buffer[9] << 8) | buffer[8];
+    }
+    else if (bytes > 3 && !memcmp(buffer, "\377\330\377", 3))
+    {
+        unsigned char *buffer_ptr = buffer + 2, *buffer_end = buffer + bytes;
+        size_t length;
+
+        image->format = "image/jpeg";
+
+        while (buffer_ptr < buffer_end)
+        {
+            if (*buffer_ptr == 0xff)
+            {
+                buffer_ptr++;
+
+                if (buffer_ptr >= buffer_end)
+                {
+                    /*
+                    TODO:
+                    if ((bytes = bemFileRead(file, buffer, sizeof(buffer))) == 0)
+                        break;
+                    */
+
+                    buffer_ptr = buffer;
+                    buffer_end = buffer + bytes;
+                }
+
+                if (*buffer_ptr == 0xff)
+                    continue;
+
+                if ((buffer_ptr + 16) >= buffer_end)
+                {
+                    bytes = (size_t)(buffer_end - buffer_ptr);
+
+                    memmove(buffer, buffer_ptr, bytes);
+                    buffer_ptr = buffer;
+                    buffer_end = buffer + bytes;
+
+                    /*
+                    TODO:
+                    if ((bytes = bemFileRead(file, buffer_end, sizeof(buffer) - bytes)) == 0)
+                        break;
+                    */
+
+                    buffer_end += bytes;
+                }
+                length = (size_t)((buffer_ptr[1] << 8) | buffer_ptr[2]);
+
+                if (*buffer_ptr == 0xe0 && length >= 16 && !memcmp(buffer_ptr + 3, "JFIF", 5))
+                {
+                    if (buffer_ptr[10] == 1)
+                    {
+                        image->units = RESOLUTION_PER_INCH;
+                        image->x_resolution = (buffer_ptr[11] << 8) | buffer_ptr[12];
+                        image->y_resolution = (buffer_ptr[13] << 8) | buffer_ptr[14];
+                    }
+                    else if (buffer_ptr[10] == 2)
+                    {
+                        image->units = RESOLUTION_PER_CM;
+                        image->x_resolution = (buffer_ptr[11] << 8) | buffer_ptr[12];
+                        image->y_resolution = (buffer_ptr[13] << 8) | buffer_ptr[14];
+                    }
+                }
+                else if ((*buffer_ptr >= 0xc0 && *buffer_ptr <= 0xc3) ||
+                         (*buffer_ptr >= 0xc5 && *buffer_ptr <= 0xc7) ||
+                         (*buffer_ptr >= 0xc9 && *buffer_ptr <= 0xcb) ||
+                         (*buffer_ptr >= 0xcd && *buffer_ptr <= 0xcf))
+                {
+
+                    image->width = (buffer_ptr[6] << 8) | buffer_ptr[7];
+                    image->height = (buffer_ptr[4] << 8) | buffer_ptr[5];
+                    break;
+                }
+
+                buffer_ptr++;
+                bytes = (size_t)(buffer_end - buffer_ptr);
+
+                while (length >= bytes)
+                {
+                    length -= bytes;
+
+                    /*
+                    TODO:
+                    if ((bytes = bemFileRead(file, buffer, sizeof(buffer))) == 0)
+                        break;
+                    */
+
+                    buffer_ptr = buffer;
+                    buffer_end = buffer + bytes;
+                }
+
+                if (length > bytes)
+                    break;
+
+                buffer_ptr += length;
+            }
+        }
+
+        if (image->width == 0 || image->height == 0)
+        {
+            free(image);
+            return NULL;
+        }
+    }
+    else
+    {
+        free(image);
+        return NULL;
+    }
+
+    return (image);
+}
+
 int main(int argc, char *argv[])
 {
     // TODO: Fix compiler warnings
