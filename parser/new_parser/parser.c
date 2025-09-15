@@ -660,6 +660,201 @@ bem_image *bemImageNew(bem_memory_pool *pool, bem_file *file)
     return (image);
 }
 
+void bemFileDelete(bem_file *file)
+{
+    if (!file)
+        return;
+
+    if (file->file_pointer)
+        gzclose(file->file_pointer);
+
+    free(file);
+}
+
+bool bemFileError(bem_file *file, const char *message, ...)
+{
+    bool result;
+    char sane_url[1024], *sane_pointer, temp[1024];
+    const char *url_pointer;
+    va_list ap;
+
+    if (file->url)
+    {
+        for (sane_pointer = sane_url, url_pointer = file->url; *url_pointer && sane_pointer < (sane_url + sizeof(sane_url) - 1); url_pointer++)
+        {
+            if (*url_pointer < ' ' || *url_pointer == '%')
+            {
+                *sane_pointer++ = '_';
+            }
+            else
+            {
+                *sane_pointer++ = *url_pointer;
+            }
+        }
+        *sane_pointer = '\0';
+
+        if (file->line_number)
+        {
+            snprintf(temp, sizeof(temp), "%s:%d: %s", sane_url, file->line_number, message);
+        }
+        else if (file->url)
+        {
+            snprintf(temp, sizeof(temp), "%s: %s", sane_url, message);
+        }
+        message = temp;
+    }
+    else if (file->line_number)
+    {
+        snprintf(temp, sizeof(temp), "%d: %s", file->line_number, message);
+        message = temp;
+    }
+
+    va_start(ap, message);
+    result = bemPoolErrorv(file->pool, file->line_number, message, ap);
+    va_end(ap);
+
+    return result;
+}
+
+int bemFileGetc(bem_file *file)
+{
+    int ch;
+
+    if (file->buffer_pointer)
+    {
+        if (file->buffer_pointer < file->buffer_end)
+        {
+            ch = (int)*(file->buffer_pointer)++;
+        }
+        else
+        {
+            ch = EOF;
+        }
+    }
+    else
+    {
+        ch = gzgetc(file->file_pointer);
+    }
+
+    if (ch == '\n')
+        file->line_number++;
+
+    return ch;
+}
+
+bem_file *bemFileNewBuffer(bem_memory_pool *pool, const void *buffer, size_t bytes)
+{
+    bem_file *file;
+
+    if ((file = calloc(1, sizeof(bem_file))) != NULL)
+    {
+        file->pool = pool;
+        file->buffer = buffer;
+        file->buffer_pointer = file->buffer;
+        file->buffer_end = file->buffer + bytes;
+        file->line_number = 1;
+    }
+
+    return file;
+}
+
+bem_file *bemFileNewString(bem_memory_pool *pool, const char *str)
+{
+    return bemFileNewBuffer(pool, str, strlen(str));
+}
+
+bem_file *bemFileNewURL(bem_memory_pool *pool, const char *url, const char *base_url)
+{
+    bem_file *file;
+    const char *file_name;
+
+    if ((file_name = bemPoolGetURL(pool, url, base_url)) == NULL)
+        return NULL;
+
+    if ((file = calloc(1, sizeof(bem_file))) != NULL)
+    {
+        file->pool = pool;
+        file->url = file_name;
+        file->file_pointer = gzopen(file_name, "rb");
+        file->line_number = 1;
+
+        if (!file->file_pointer)
+        {
+            perror(file_name);
+            free(file);
+            file = NULL;
+        }
+    }
+
+    return file;
+}
+
+size_t bemFileRead(bem_file *file, void *buffer, size_t bytes)
+{
+    ssize_t read_bytes;
+
+    if (!file || !buffer || bytes == 0)
+        return 0;
+
+    if (file->buffer_pointer)
+    {
+        if ((size_t)(file->buffer_end - file->buffer_pointer) < bytes)
+            bytes = (size_t)(file->buffer_end - file->buffer_pointer);
+
+        if (bytes > 0)
+        {
+            memcpy(buffer, file->buffer_pointer, bytes);
+            file->buffer_pointer += bytes;
+        }
+
+        return bytes;
+    }
+    else if ((read_bytes = gzread(file->file_pointer, buffer, (unsigned)bytes)) < 0)
+    {
+        return 0;
+    }
+
+    return (size_t)read_bytes;
+}
+
+size_t bemFileSeek(bem_file *file, size_t offset)
+{
+    ssize_t seek_offset;
+
+    if (!file)
+        return 0;
+
+    if (file->buffer_pointer)
+    {
+        if (offset > (size_t)(file->buffer_end - file->buffer))
+            offset = (size_t)(file->buffer_end - file->buffer);
+
+        file->buffer_pointer = file->buffer + offset;
+
+        return offset;
+    }
+
+    if ((seek_offset = gzseek(file->file_pointer, (long)offset, SEEK_SET)) < 0)
+        return 0;
+
+    return (size_t)seek_offset;
+}
+
+void bemFileUngetc(bem_file *file, int ch)
+{
+    if (file->buffer_pointer && file->buffer_pointer > file->buffer)
+    {
+        file->buffer_pointer--;
+    }
+    else if (file->file_pointer)
+    {
+        gzungetc(ch, file->file_pointer);
+    }
+
+    if (ch == '\n')
+        file->line_number--;
+}
+
 int main(int argc, char *argv[])
 {
     // TODO: Fix compiler warnings
